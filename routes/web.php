@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,5 +21,8 @@ Route::middleware('auth')->group(function () {
 
 // Route Data Wilayah
 Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+
+// Route User
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 require __DIR__ . '/auth.php';
