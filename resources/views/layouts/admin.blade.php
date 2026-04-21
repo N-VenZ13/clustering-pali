@@ -48,6 +48,34 @@
                     <span x-show="sidebarOpen" class="whitespace-nowrap">Data Wilayah</span>
                 </a>
 
+                <!-- Menu CLUSTERING (Dropdown) -->
+                <div x-data="{ openCluster: true }" class="space-y-1">
+                    <!-- Tombol Induk -->
+                    <button @click="openCluster = !openCluster" class="w-full flex items-center justify-between px-3 py-3 rounded-lg text-[#CBD5E1] hover:bg-white/5 hover:text-white transition group">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                            <span x-show="sidebarOpen" class="whitespace-nowrap font-medium">Clustering</span>
+                        </div>
+                        <svg x-show="sidebarOpen" :class="openCluster ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Sub-menu -->
+                    <div x-show="openCluster && sidebarOpen" x-collapse class="pl-11 pr-3 space-y-1">
+                        <!-- Sub 1: Indikator -->
+                        <a href="{{ route('indikator.index') }}" class="block px-3 py-2 rounded-lg text-sm text-[#CBD5E1] hover:bg-white/10 hover:text-white transition">
+                            Kamus Indikator
+                        </a>
+                        <!-- Sub 2: Proses Cluster (Dummy dulu) -->
+                        <a href="{{ route('kmeans.index') }}" class="block px-3 py-2 rounded-lg text-sm text-[#CBD5E1] hover:bg-white/10 hover:text-white transition">
+                            Proses K-Means
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Menu Data User -->
                 <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#CBD5E1] hover:bg-white/5 hover:text-white transition group" title="Data User">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

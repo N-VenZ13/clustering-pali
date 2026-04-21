@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\IndikatorController;
+use App\Http\Controllers\Admin\KMeansController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\ProfileController;
@@ -24,5 +26,15 @@ Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index
 
 // Route User
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+// Route Indikator
+Route::get('/indikator', [IndikatorController::class, 'index'])->name('indikator.index');
+
+// Route Clustering
+Route::get('/kmeans', [KMeansController::class, 'index'])->name('kmeans.index');
+
+// Route untuk import Excel
+Route::post('/kmeans/import', [KMeansController::class, 'importExcel'])->name('kmeans.import');
+
 
 require __DIR__ . '/auth.php';

@@ -1,0 +1,156 @@
+@extends('layouts.admin')
+
+@section('title', 'PROSES CLUSTERING K-MEANS')
+
+@section('content')
+
+<!-- ALERT NOTIFIKASI -->
+@if(session('success'))
+<div class="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 flex items-start gap-3">
+    <svg class="w-5 h-5 text-green-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <p class="text-green-800 text-sm font-medium">{{ session('success') }}</p>
+</div>
+@endif
+
+@if(session('error'))
+<div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+    <svg class="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <div class="text-red-800 text-sm font-medium">
+        <p>Gagal meng-upload data:</p>
+        <p class="font-normal mt-1">{{ session('error') }}</p>
+    </div>
+</div>
+@endif
+
+<!-- CONTROL PANEL (Atas) -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6 flex flex-col lg:flex-row justify-between items-center gap-4">
+
+    <!-- Filter Tahun -->
+    <form action="{{ route('kmeans.index') }}" method="GET" class="flex items-center gap-3 w-full lg:w-auto">
+        <label class="text-sm font-semibold text-[#64748B]">Tahun Data:</label>
+        <select name="tahun" onchange="this.form.submit()" class="border-gray-200 rounded-lg text-sm focus:ring-[#1E3A8A] focus:border-[#1E3A8A]">
+            <option value="2024" {{ $tahun_aktif == 2024 ? 'selected' : '' }}>2024</option>
+            <option value="2025" {{ $tahun_aktif == 2025 ? 'selected' : '' }}>2025</option>
+        </select>
+    </form>
+
+    <!-- Aksi K-Means -->
+    <div class="flex items-center gap-3 w-full lg:w-auto">
+        <!-- Tombol Upload Excel -->
+        <!-- <button class="bg-slate-100 hover:bg-slate-200 text-[#1E293B] font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                Upload Excel
+            </button> -->
+
+        <!-- Form Upload Excel -->
+        <form action="{{ route('kmeans.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center">
+            @csrf
+            <!-- Input File disembunyikan, dipicu lewat label -->
+            <input type="file" name="file_excel" id="file_excel" class="hidden" onchange="this.form.submit()" accept=".xlsx, .xls">
+            <label for="file_excel" class="bg-slate-100 hover:bg-slate-200 text-[#1E293B] font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition text-sm cursor-pointer border border-slate-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Upload Excel
+            </label>
+        </form>
+
+        <!-- Tombol Eksekusi -->
+        <button class="bg-[#F97316] hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 transition text-sm shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+            Jalankan K-Means
+        </button>
+    </div>
+</div>
+
+<!-- SUMMARY CARDS (Tengah) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
+        <div class="w-3 h-12 bg-[#10B981] rounded-full"></div>
+        <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster I (Sejahtera)</p>
+            <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_1'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
+        <div class="w-3 h-12 bg-[#F59E0B] rounded-full"></div>
+        <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster II (Berkembang)</p>
+            <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_2'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
+        <div class="w-3 h-12 bg-[#EF4444] rounded-full"></div>
+        <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster III (Perlu Perhatian)</p>
+            <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_3'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
+        </div>
+    </div>
+</div>
+
+<!-- DATA TABLE (Bawah) -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-[#F8FAFC] text-xs uppercase text-[#64748B] border-b border-slate-100">
+                <tr>
+                    <th class="px-6 py-4 font-bold">Desa</th>
+                    <th class="px-4 py-4">% Miskin</th>
+                    <th class="px-4 py-4">% RTLH</th>
+                    <th class="px-4 py-4">Pend.</th>
+                    <th class="px-4 py-4">Jarak SMA</th>
+                    <th class="px-4 py-4">Posyandu</th>
+                    <th class="px-4 py-4">Puskesmas</th>
+                    <th class="px-4 py-4">% Listrik</th>
+                    <th class="px-4 py-4">% Jalan</th>
+                    <th class="px-6 py-4 text-right font-bold text-[#1E3A8A]">Hasil Klaster</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($data_desa as $row)
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 font-bold text-[#1E293B]">{{ $row->desa->nama_desa }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_miskin }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rtlh }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rasio_pendidikan }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jarak_sekolah }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rasio_posyandu }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jarak_puskesmas }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_listrik }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jalan }}</td>
+                    <td class="px-6 py-4 text-right">
+                        @if($row->klaster_hasil == 1)
+                        <span class="px-3 py-1 bg-[#10B981]/10 text-[#10B981] font-bold rounded-md border border-[#10B981]/20">1 - Sejahtera</span>
+                        @elseif($row->klaster_hasil == 2)
+                        <span class="px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] font-bold rounded-md border border-[#F59E0B]/20">2 - Berkembang</span>
+                        @elseif($row->klaster_hasil == 3)
+                        <span class="px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] font-bold rounded-md border border-[#EF4444]/20">3 - Perhatian</span>
+                        @else
+                        <span class="text-slate-400 italic">- Belum Diproses -</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="10" class="px-6 py-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <p>Data indikator untuk tahun ini masih kosong.</p>
+                            <p class="text-sm">Silakan klik "Upload Excel" untuk memasukkan data.</p>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
