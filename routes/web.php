@@ -36,5 +36,8 @@ Route::get('/kmeans', [KMeansController::class, 'index'])->name('kmeans.index');
 // Route untuk import Excel
 Route::post('/kmeans/import', [KMeansController::class, 'importExcel'])->name('kmeans.import');
 
+// Route untuk menjalankan K-Means
+Route::post('/kmeans/proses', [KMeansController::class, 'prosesKMeans'])->name('kmeans.proses');
+
 
 require __DIR__ . '/auth.php';

@@ -49,6 +49,9 @@
         <!-- Form Upload Excel -->
         <form action="{{ route('kmeans.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center">
             @csrf
+            <!-- TAMBAHKAN BARIS INI: Mengirim tahun diam-diam -->
+            <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
+
             <!-- Input File disembunyikan, dipicu lewat label -->
             <input type="file" name="file_excel" id="file_excel" class="hidden" onchange="this.form.submit()" accept=".xlsx, .xls">
             <label for="file_excel" class="bg-slate-100 hover:bg-slate-200 text-[#1E293B] font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition text-sm cursor-pointer border border-slate-200">
@@ -60,12 +63,16 @@
         </form>
 
         <!-- Tombol Eksekusi -->
-        <button class="bg-[#F97316] hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 transition text-sm shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-            </svg>
-            Jalankan K-Means
-        </button>
+        <form action="{{ route('kmeans.proses') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
+            <button type="submit" onclick="return confirm('Jalankan algoritma K-Means sekarang?')" class="bg-[#F97316] hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 transition text-sm shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                Jalankan K-Means
+            </button>
+        </form>
     </div>
 </div>
 
@@ -101,14 +108,14 @@
             <thead class="bg-[#F8FAFC] text-xs uppercase text-[#64748B] border-b border-slate-100">
                 <tr>
                     <th class="px-6 py-4 font-bold">Desa</th>
-                    <th class="px-4 py-4">% Miskin</th>
-                    <th class="px-4 py-4">% RTLH</th>
-                    <th class="px-4 py-4">Pend.</th>
-                    <th class="px-4 py-4">Jarak SMA</th>
-                    <th class="px-4 py-4">Posyandu</th>
-                    <th class="px-4 py-4">Puskesmas</th>
-                    <th class="px-4 py-4">% Listrik</th>
-                    <th class="px-4 py-4">% Jalan</th>
+                    <th class="px-4 py-4">Listrik PLN</th>
+                    <th class="px-4 py-4">Fas. Ekonomi</th>
+                    <th class="px-4 py-4">Fas. Pendidikan</th>
+                    <th class="px-4 py-4">Akses SMA</th>
+                    <th class="px-4 py-4">Faskes Desa</th>
+                    <th class="px-4 py-4">Jarak Pusk.</th>
+                    <th class="px-4 py-4">Sinyal</th>
+                    <th class="px-4 py-4">Bencana</th>
                     <th class="px-6 py-4 text-right font-bold text-[#1E3A8A]">Hasil Klaster</th>
                 </tr>
             </thead>
@@ -116,23 +123,23 @@
                 @forelse($data_desa as $row)
                 <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
                     <td class="px-6 py-4 font-bold text-[#1E293B]">{{ $row->desa->nama_desa }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_miskin }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rtlh }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rasio_pendidikan }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jarak_sekolah }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_rasio_posyandu }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jarak_puskesmas }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_listrik }}</td>
-                    <td class="px-4 py-4 text-slate-500">{{ $row->var_jalan }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->listrik_pln }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->fasilitas_ekonomi }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->fasilitas_pendidikan }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->akses_sma }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->faskes_desa }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->akses_puskesmas }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->kualitas_sinyal }}</td>
+                    <td class="px-4 py-4 text-slate-500">{{ $row->keamanan_bencana }}</td>
                     <td class="px-6 py-4 text-right">
                         @if($row->klaster_hasil == 1)
-                        <span class="px-3 py-1 bg-[#10B981]/10 text-[#10B981] font-bold rounded-md border border-[#10B981]/20">1 - Sejahtera</span>
+                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#10B981]/10 text-[#10B981] font-bold rounded-md border border-[#10B981]/20">1 - Sejahtera</span>
                         @elseif($row->klaster_hasil == 2)
-                        <span class="px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] font-bold rounded-md border border-[#F59E0B]/20">2 - Berkembang</span>
+                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] font-bold rounded-md border border-[#F59E0B]/20">2 - Berkembang</span>
                         @elseif($row->klaster_hasil == 3)
-                        <span class="px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] font-bold rounded-md border border-[#EF4444]/20">3 - Perhatian</span>
+                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] font-bold rounded-md border border-[#EF4444]/20">3 - Perhatian</span>
                         @else
-                        <span class="text-slate-400 italic">- Belum Diproses -</span>
+                        <span class="inline-block whitespace-nowrap text-slate-400 italic">- Belum Diproses -</span>
                         @endif
                     </td>
                 </tr>
