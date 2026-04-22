@@ -39,5 +39,14 @@ Route::post('/kmeans/import', [KMeansController::class, 'importExcel'])->name('k
 // Route untuk menjalankan K-Means
 Route::post('/kmeans/proses', [KMeansController::class, 'prosesKMeans'])->name('kmeans.proses');
 
+// Route untuk menyimpan hasil agregasi (klasterisasi)
+Route::post('/kmeans/agregasi', [KMeansController::class, 'simpanAgregasi'])->name('kmeans.agregasi');
+
+// Route untuk edit indikator manual
+Route::get('/indikator/{id}/edit', [IndikatorController::class, 'edit'])->name('indikator.edit');
+
+// Route untuk update indikator manual
+Route::put('/indikator/{id}', [IndikatorController::class, 'update'])->name('indikator.update');
+
 
 require __DIR__ . '/auth.php';

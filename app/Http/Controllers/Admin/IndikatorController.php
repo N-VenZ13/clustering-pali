@@ -23,4 +23,23 @@ class IndikatorController extends Controller
 
         return view('admin.indikator.index', compact('indikators'));
     }
+
+    public function edit($id)
+    {
+        $indikator = \App\Models\Indikator::with('desa')->findOrFail($id);
+        return view('admin.indikator.edit', compact('indikator'));
+    }
+
+    public function update(\Illuminate\Http\Request $request, $id)
+    {
+        $indikator = \App\Models\Indikator::findOrFail($id);
+
+        $indikator->update($request->except(['_token', '_method']));
+
+        // Reset klaster_hasil menjadi null karena datanya berubah (wajib K-Means ulang)
+        $indikator->update(['klaster_hasil' => null]);
+
+        return redirect()->route('kmeans.index', ['tahun' => $indikator->tahun_data])
+            ->with('success', 'Data Desa ' . $indikator->desa->nama_desa . ' berhasil diperbarui! Silakan jalankan ulang K-Means.');
+    }
 }

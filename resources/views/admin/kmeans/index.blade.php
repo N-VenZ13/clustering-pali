@@ -33,8 +33,9 @@
     <form action="{{ route('kmeans.index') }}" method="GET" class="flex items-center gap-3 w-full lg:w-auto">
         <label class="text-sm font-semibold text-[#64748B]">Tahun Data:</label>
         <select name="tahun" onchange="this.form.submit()" class="border-gray-200 rounded-lg text-sm focus:ring-[#1E3A8A] focus:border-[#1E3A8A]">
-            <option value="2024" {{ $tahun_aktif == 2024 ? 'selected' : '' }}>2024</option>
-            <option value="2025" {{ $tahun_aktif == 2025 ? 'selected' : '' }}>2025</option>
+            @foreach($list_tahun as $thn)
+            <option value="{{ $thn }}" {{ $tahun_aktif == $thn ? 'selected' : '' }}>{{ $thn }}</option>
+            @endforeach
         </select>
     </form>
 
@@ -117,6 +118,7 @@
                     <th class="px-4 py-4">Sinyal</th>
                     <th class="px-4 py-4">Bencana</th>
                     <th class="px-6 py-4 text-right font-bold text-[#1E3A8A]">Hasil Klaster</th>
+                    <th class="px-6 py-4 text-center font-bold">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -142,6 +144,14 @@
                         <span class="inline-block whitespace-nowrap text-slate-400 italic">- Belum Diproses -</span>
                         @endif
                     </td>
+                    <td class="px-6 py-4 text-center">
+                        <!-- Tombol Edit mengarah ke halaman edit khusus -->
+                        <a href="{{ route('indikator.edit', $row->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition" title="Edit Manual">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                        </a>
+                    </td>
                 </tr>
                 @empty
                 <tr>
@@ -159,5 +169,22 @@
             </tbody>
         </table>
     </div>
+
+    </table>
+</div>
+
+<!-- TOMBOL BOTTOM-UP AGGREGATION -->
+<div class="bg-slate-50 border-t border-slate-100 p-4 flex justify-end">
+    <form action="{{ route('kmeans.agregasi') }}" method="POST">
+        @csrf
+        <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
+        <button type="submit" onclick="return confirm('Simpan hasil ini dan update status Kecamatan?')" class="bg-[#F97316] hover:bg-orange-600 text-white font-bold py-2.5 px-8 rounded-lg flex items-center gap-2 transition shadow-md">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+            </svg>
+            Simpan & Update Data Kecamatan
+        </button>
+    </form>
+</div>
 </div>
 @endsection
