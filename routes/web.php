@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IndikatorController;
 use App\Http\Controllers\Admin\KMeansController;
 use App\Http\Controllers\Admin\LaporanController;
@@ -13,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -26,8 +27,24 @@ Route::middleware('auth')->group(function () {
 // Route Data Wilayah
 Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
 
-// Route User
+// CRUD Kecamatan
+Route::post('/wilayah/kecamatan', [WilayahController::class, 'storeKecamatan'])->name('kecamatan.store');
+Route::put('/wilayah/kecamatan/{id}', [WilayahController::class, 'updateKecamatan'])->name('kecamatan.update');
+Route::delete('/wilayah/kecamatan/{id}', [WilayahController::class, 'destroyKecamatan'])->name('kecamatan.destroy');
+
+// CRUD Desa
+Route::post('/wilayah/desa', [WilayahController::class, 'storeDesa'])->name('desa.store');
+Route::put('/wilayah/desa/{id}', [WilayahController::class, 'updateDesa'])->name('desa.update');
+Route::delete('/wilayah/desa/{id}', [WilayahController::class, 'destroyDesa'])->name('desa.destroy');
+
+
+// CRUD Data User
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
 // Route Indikator
 Route::get('/indikator', [IndikatorController::class, 'index'])->name('indikator.index');
@@ -54,7 +71,12 @@ Route::put('/indikator/{id}', [IndikatorController::class, 'update'])->name('ind
 Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 
 // Route untuk update status laporan
-Route::post('/laporan/status', [LaporanController::class, 'updateStatus'])->name('laporan.status');
+// Route::post('/laporan/status', [LaporanController::class, 'updateStatus'])->name('laporan.status');
+
+// Hanya Pimpinan yang boleh POST ke URL ini
+Route::post('/laporan/status', [LaporanController::class, 'updateStatus'])
+    ->name('laporan.status')
+    ->middleware('role:pimpinan');
 
 // Route untuk halaman depan (public)
 Route::get('/', [FrontController::class, 'index'])->name('home');

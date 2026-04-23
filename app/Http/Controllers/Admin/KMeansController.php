@@ -37,7 +37,7 @@ class KMeansController extends Controller
         return view('admin.kmeans.index', compact('data_desa', 'tahun_aktif', 'summary', 'list_tahun'));
     }
 
-    
+
 
     public function importExcel(Request $request)
     {
@@ -74,50 +74,23 @@ class KMeansController extends Controller
     {
         $tahun = $request->tahun;
 
-        // Ambil semua kecamatan beserta data desa dan indikatornya di tahun tersebut
-        $kecamatans = \App\Models\Kecamatan::with(['desas.indikators' => function ($query) use ($tahun) {
-            $query->where('tahun_data', $tahun);
-        }])->get();
+        // 1. Cek apakah laporan tahun ini sudah di-ACC Pimpinan?
+        $laporan = \App\Models\Laporan::where('tahun', $tahun)->first();
 
-        foreach ($kecamatans as $kecamatan) {
-            $totalSkor = 0;
-            $jumlahDesaDiproses = 0;
-
-            // Loop semua desa di dalam kecamatan ini
-            foreach ($kecamatan->desas as $desa) {
-                // Ambil indikator tahun yang dipilih
-                $indikator = $desa->indikators->first();
-
-                // Jika desa ini sudah punya hasil klaster (1, 2, atau 3)
-                if ($indikator && $indikator->klaster_hasil != null) {
-                    $totalSkor += $indikator->klaster_hasil;
-                    $jumlahDesaDiproses++;
-                }
-            }
-
-            // Jika ada desa yang diproses, hitung rata-ratanya
-            if ($jumlahDesaDiproses > 0) {
-                $rataRata = $totalSkor / $jumlahDesaDiproses;
-
-                // Tentukan Status Kecamatan berdasarkan nilai rata-rata (Weighted Average)
-                // Klaster 1 = Sejahtera, 2 = Berkembang, 3 = Perhatian
-                if ($rataRata < 1.67) {
-                    $status = 'Sejahtera';
-                } elseif ($rataRata >= 1.67 && $rataRata <= 2.33) {
-                    $status = 'Berkembang';
-                } else {
-                    $status = 'Perlu Perhatian';
-                }
-
-                // Update data kecamatan
-                $kecamatan->update([
-                    'skor_agregasi' => round($rataRata, 2),
-                    'status_akhir' => $status,
-                    'status_validasi' => 'draft' // Menunggu approval Pimpinan
-                ]);
-            }
+        if ($laporan && $laporan->status === 'accepted') {
+            return redirect()->back()->with('error', 'DATA TERKUNCI! Laporan tahun ' . $tahun . ' sudah disetujui Pimpinan dan tidak bisa diubah lagi.');
         }
 
-        return redirect()->back()->with('success', 'Agregasi berhasil! Status Kecamatan telah diupdate dan masuk ke draf Laporan Pimpinan.');
+        // 2. Jika belum terkunci, Buat atau Update Laporan jadi 'Pending' (Menunggu ACC)
+        \App\Models\Laporan::updateOrCreate(
+            ['tahun' => $tahun],
+            ['status' => 'pending'] // Naik ke meja pimpinan
+        );
+
+        // (Kita tidak perlu lagi menyimpan agregasi ke tabel Kecamatan.
+        // Nanti agregasi akan kita hitung secara dinamis (on the fly) saat Pimpinan / Peta memanggilnya,
+        // Ini adalah Best Practice database agar tidak ada redundansi data).
+
+        return redirect()->route('laporan.index')->with('success', 'Agregasi K-Means berhasil! Laporan tahun ' . $tahun . ' telah diajukan ke Pimpinan.');
     }
 }

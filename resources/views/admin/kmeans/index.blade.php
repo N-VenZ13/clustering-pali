@@ -5,7 +5,7 @@
 @section('content')
 
 <!-- ALERT NOTIFIKASI -->
-@if(session('success'))
+<!-- @if(session('success'))
 <div class="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 flex items-start gap-3">
     <svg class="w-5 h-5 text-green-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -24,7 +24,7 @@
         <p class="font-normal mt-1">{{ session('error') }}</p>
     </div>
 </div>
-@endif
+@endif -->
 
 <!-- CONTROL PANEL (Atas) -->
 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6 flex flex-col lg:flex-row justify-between items-center gap-4">
