@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\Admin\IndikatorController;
 use App\Http\Controllers\Admin\KMeansController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -48,5 +50,13 @@ Route::get('/indikator/{id}/edit', [IndikatorController::class, 'edit'])->name('
 // Route untuk update indikator manual
 Route::put('/indikator/{id}', [IndikatorController::class, 'update'])->name('indikator.update');
 
+// Route untuk laporan
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+
+// Route untuk update status laporan
+Route::post('/laporan/status', [LaporanController::class, 'updateStatus'])->name('laporan.status');
+
+// Route untuk halaman depan (public)
+Route::get('/', [FrontController::class, 'index'])->name('home');
 
 require __DIR__ . '/auth.php';
