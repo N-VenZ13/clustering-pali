@@ -22,11 +22,14 @@
     <!-- NAVBAR (Header Publik) -->
     <nav class="h-[80px] bg-white shadow-md flex items-center justify-between px-8 relative z-50">
         <div class="flex items-center gap-4">
-            <!-- Ganti dengan Logo Asli PALI/BPS nanti -->
-            <div class="w-10 h-10 bg-[#1E3A8A] rounded-full flex items-center justify-center text-white font-bold">P</div>
+            
+             <!-- Logo BPS -->
+            <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo BPS" class="w-full h-full object-contain">
+            </div>
             <div>
                 <h1 class="text-xl font-bold text-[#1E293B]">Sistem Pemetaan Kesejahteraan Sosial</h1>
-                <p class="text-xs text-slate-500 font-semibold">Kabupaten Penukal Abab Lematang Ilir</p>
+                <p class="text-xs text-slate-500 font-semibold">Badan Pusat Statistik Kab. Penukal Abab Lematang Ilir</p>
             </div>
         </div>
         <div>
@@ -89,12 +92,12 @@
                 </div>
 
                 <!-- Insight Box -->
-                <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <!-- <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
                     <div class="flex items-center gap-2 mb-2">
                         <span>🤖</span><h4 class="font-bold text-[#1E3A8A]">Insight K-Means</h4>
                     </div>
                     <p class="text-sm text-blue-800 leading-relaxed">Status wilayah ini didapatkan menggunakan metode Bottom-Up Aggregation berdasarkan modus (mayoritas) nilai klaster desa-desa di dalamnya.</p>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -315,25 +318,59 @@
             if(dataDesaDb && dataDesaDb.indikators.length > 0) {
                 let ind = dataDesaDb.indikators[0];
                 
+                // ==========================================
+                // 🤖 LOGIKA "DYNAMIC INSIGHT" (AI RULE-BASED)
+                // ==========================================
+                let penyakitDesa = [];
+                
+                // Cek indikator yang nilainya "Jelek/Kurang" berdasarkan threshold logika umum
+                if(ind.listrik_pln < 50) penyakitDesa.push("minimnya rasio keluarga berlistrik PLN");
+                if(ind.fasilitas_pendidikan < 2) penyakitDesa.push("kurangnya fasilitas pendidikan (SD/SMP)");
+                if(ind.akses_sma > 10) penyakitDesa.push("jauhnya akses tempuh menuju SMA/SMK");
+                if(ind.faskes_desa < 1) penyakitDesa.push("ketiadaan fasilitas kesehatan desa (Poskesdes/Polindes)");
+                if(ind.akses_puskesmas > 15) penyakitDesa.push("sulitnya akses menuju Puskesmas Kecamatan");
+                if(ind.kualitas_sinyal <= 2) penyakitDesa.push("buruknya kualitas sinyal telekomunikasi");
+                if(ind.keamanan_bencana <= 5) penyakitDesa.push("tingginya kerentanan terhadap bencana");
+
+                // Merangkai kalimat AI
+                let kalimatInsight = "";
+                let namaKlaster = klaster == 1 ? 'Sejahtera' : (klaster == 2 ? 'Berkembang' : 'Perlu Perhatian');
+                
+                if(klaster == 1) {
+                    kalimatInsight = `Desa ini masuk ke dalam <b>Klaster ${namaKlaster}</b>. Berdasarkan analisis sistem, mayoritas indikator kesejahteraan sudah berada di atas rata-rata. Pemda direkomendasikan untuk mempertahankan fasilitas yang ada dan fokus pada pemberdayaan ekonomi lanjutan.`;
+                } else {
+                    if(penyakitDesa.length > 0) {
+                        // Gabungkan array penyakit dengan kata "dan" di akhir
+                        let masalahString = penyakitDesa.slice(0, -1).join(', ');
+                        if(penyakitDesa.length > 1) masalahString += ' dan ' + penyakitDesa[penyakitDesa.length - 1];
+                        else masalahString = penyakitDesa[0];
+
+                        kalimatInsight = `Desa ini ditetapkan sebagai <b>Klaster ${namaKlaster}</b>. Analisis sistem mendeteksi bahwa faktor utama yang menghambat kesejahteraan desa ini adalah <b>${masalahString}</b>. <br><br><b>Rekomendasi:</b> Pemda disarankan memprioritaskan pembangunan/intervensi pada sektor-sektor tersebut untuk tahun anggaran berikutnya.`;
+                    } else {
+                        kalimatInsight = `Desa ini ditetapkan sebagai <b>Klaster ${namaKlaster}</b>. Meskipun tidak ada indikator yang terdeteksi sangat kritis secara individual, akumulasi dari seluruh 8 indikator masih berada di bawah standar klaster sejahtera berdasarkan perhitungan jarak <i>Euclidean</i>.`;
+                    }
+                }
+
+                // Render HTML
                 contentHTML += `
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2">Data Indikator (Tahun ${ind.tahun_data})</h3>
-                    <div class="space-y-3 mb-8">
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Listrik PLN</span> <span class="font-bold text-[#1E293B]">${ind.listrik_pln}%</span></div>
+                    <div class="space-y-3 mb-8 text-sm">
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Listrik PLN</span> <span class="font-bold ${ind.listrik_pln < 50 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.listrik_pln}%</span></div>
                         <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Fasilitas Ekonomi</span> <span class="font-bold text-[#1E293B]">${ind.fasilitas_ekonomi} Unit</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Fasilitas Pendidikan</span> <span class="font-bold text-[#1E293B]">${ind.fasilitas_pendidikan} Unit</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Jarak Akses SMA</span> <span class="font-bold text-[#1E293B]">${ind.akses_sma} Km</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Faskes Desa</span> <span class="font-bold text-[#1E293B]">${ind.faskes_desa} Unit</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Jarak Puskesmas</span> <span class="font-bold text-[#1E293B]">${ind.akses_puskesmas} Km</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Kualitas Sinyal</span> <span class="font-bold text-[#1E293B]">${ind.kualitas_sinyal} Skor</span></div>
-                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Keamanan Bencana</span> <span class="font-bold text-[#1E293B]">${ind.keamanan_bencana} Skor</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Fasilitas Pendidikan</span> <span class="font-bold ${ind.fasilitas_pendidikan < 2 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.fasilitas_pendidikan} Unit</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Jarak Akses SMA</span> <span class="font-bold ${ind.akses_sma > 10 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.akses_sma} Km</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Faskes Desa</span> <span class="font-bold ${ind.faskes_desa < 1 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.faskes_desa} Unit</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Jarak Puskesmas</span> <span class="font-bold ${ind.akses_puskesmas > 15 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.akses_puskesmas} Km</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Kualitas Sinyal</span> <span class="font-bold ${ind.kualitas_sinyal <= 2 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.kualitas_sinyal} Skor</span></div>
+                        <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">Keamanan Bencana</span> <span class="font-bold ${ind.keamanan_bencana <= 5 ? 'text-red-500' : 'text-[#1E293B]'}">${ind.keamanan_bencana} Skor</span></div>
                     </div>
 
-                    <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span>🤖</span><h4 class="font-bold text-orange-800">Insight K-Means</h4>
+                    <div class="p-5 bg-blue-50 rounded-xl border border-blue-100 shadow-inner">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-xl">🤖</span><h4 class="font-bold text-[#1E3A8A] text-lg">Smart Insight</h4>
                         </div>
-                        <p class="text-sm text-orange-900 leading-relaxed">
-                            Berdasarkan perhitungan Machine Learning, desa ini diklasifikasikan ke dalam <b>${klaster == 1 ? 'Klaster Sejahtera' : (klaster == 2 ? 'Klaster Berkembang' : 'Klaster Perlu Perhatian')}</b> berdasarkan kedekatan jarak (*Euclidean Distance*) terhadap centroid klaster tersebut.
+                        <p class="text-sm text-blue-900 leading-relaxed text-justify">
+                            ${kalimatInsight}
                         </p>
                     </div>
                 `;
@@ -362,6 +399,8 @@
                 map.fitBounds(kecamatanLayer.getBounds());
             }
         }
+
+        
     </script>
 </body>
 </html>

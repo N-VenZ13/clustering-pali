@@ -61,6 +61,9 @@ Route::post('/kmeans/proses', [KMeansController::class, 'prosesKMeans'])->name('
 // Route untuk menyimpan hasil agregasi (klasterisasi)
 Route::post('/kmeans/agregasi', [KMeansController::class, 'simpanAgregasi'])->name('kmeans.agregasi');
 
+// Route untuk reset data indikator
+Route::delete('/kmeans/reset', [KMeansController::class, 'resetData'])->name('kmeans.reset');
+
 // Route untuk edit indikator manual
 Route::get('/indikator/{id}/edit', [IndikatorController::class, 'edit'])->name('indikator.edit');
 

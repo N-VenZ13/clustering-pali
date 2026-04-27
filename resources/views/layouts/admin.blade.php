@@ -15,8 +15,25 @@
 
 <body class="font-sans antialiased bg-[#F8FAFC] text-[#1E293B]">
 
-    <!-- Alpine.js State: sidebarOpen -->
-    <div x-data="{ sidebarOpen: true }" class="min-h-screen flex">
+    <!-- Alpine.js State dengan Global Event Listener -->
+    <div x-data="{ 
+            sidebarOpen: true, 
+            confirmModal: false, 
+            confirmFormId: '', 
+            confirmTitle: '', 
+            confirmMessage: '', 
+            confirmBtnText: '', 
+            confirmBtnColor: '' 
+         }"
+        @open-confirm.window="
+            confirmTitle = $event.detail.title;
+            confirmMessage = $event.detail.msg;
+            confirmBtnText = $event.detail.btnText;
+            confirmBtnColor = $event.detail.btnColor;
+            confirmFormId = $event.detail.formId;
+            confirmModal = true;
+         "
+        class="min-h-screen flex relative">
 
         <!-- SIDEBAR (Kiri) -->
         <aside :class="sidebarOpen ? 'w-64' : 'w-20'" class="bg-[#1E3A8A] text-white flex flex-col shadow-xl z-20 hidden md:flex transition-all duration-300">
@@ -99,6 +116,9 @@
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 z-10">
                 <h1 class="text-xl font-bold text-[#334155]">@yield('title')</h1>
 
+                <!-- Logo Topbar -->
+                    <!-- <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-8 h-8 rounded-full border border-slate-200 object-contain p-0.5"> -->
+
                 <!-- Profile / Logout -->
                 <div class="flex items-center gap-4">
                     <span class="text-sm font-medium text-[#64748B]">{{ Auth::user()->name }}</span>
@@ -135,6 +155,46 @@
                 @yield('content')
             </div>
         </main>
+
+        <!-- ======================= GLOBAL CONFIRMATION MODAL ======================= -->
+        <div x-show="confirmModal" class="fixed inset-0 z-[99] flex items-center justify-center" x-cloak>
+            <!-- Background Overlay -->
+            <div x-show="confirmModal" x-transition.opacity class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="confirmModal = false"></div>
+
+            <!-- Modal Box -->
+            <div x-show="confirmModal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 overflow-hidden mx-4 text-center">
+
+                <!-- Icon Peringatan (Kuning/Merah dinamis) -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4" :class="confirmBtnColor == 'red' ? 'bg-red-100' : 'bg-orange-100'">
+                    <svg :class="confirmBtnColor == 'red' ? 'text-red-600' : 'text-orange-600'" class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+
+                <!-- Teks Dinamis -->
+                <h3 class="text-xl font-bold text-slate-800 mb-2" x-text="confirmTitle"></h3>
+                <p class="text-slate-500 text-sm mb-8" x-text="confirmMessage"></p>
+
+                <!-- Tombol Aksi -->
+                <div class="flex items-center justify-center gap-3">
+                    <button type="button" @click="confirmModal = false" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition w-full">Batal</button>
+
+                    <!-- Tombol ini yang akan meng-submit form rahasia -->
+                    <button type="button"
+                        @click="document.getElementById(confirmFormId).submit(); confirmModal = false;"
+                        :class="confirmBtnColor == 'red' ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'"
+                        class="px-5 py-2.5 text-white font-semibold rounded-xl transition w-full shadow-sm" x-text="confirmBtnText">
+                    </button>
+                </div>
+            </div>
+        </div>
 
     </div>
 </body>

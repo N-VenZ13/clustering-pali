@@ -29,25 +29,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 3. Buat 5 Kecamatan PALI (Sesuai Skripsi Anda)
-        $kecamatans = ['Talang Ubi', 'Penukal', 'Penukal Utara', 'Abab', 'Tanah Abang'];
+        // $kecamatans = ['Talang Ubi', 'Penukal', 'Penukal Utara', 'Abab', 'Tanah Abang'];
 
-        foreach ($kecamatans as $kecamatan) {
-            Kecamatan::create([
-                'nama_kecamatan' => $kecamatan,
-                'status_validasi' => 'draft',
-            ]);
-        }
+        // foreach ($kecamatans as $kecamatan) {
+        //     Kecamatan::create([
+        //         'nama_kecamatan' => $kecamatan,
+        //         'status_validasi' => 'draft',
+        //     ]);
+        // }
 
-        // 4. Buat beberapa Data Desa Dummy
-        \App\Models\Desa::create([
-            'kecamatan_id' => 1, // ID 1 = Talang Ubi
-            'nama_desa' => 'Desa Talang Akar' // Ini akan mendapat ID 1 di tabel desa
-        ]);
-
-        \App\Models\Desa::create([
-            'kecamatan_id' => 1,
-            'nama_desa' => 'Desa Pendopo' // Ini akan mendapat ID 2 di tabel desa
-        ]);
+        
     }
 
     // use WithoutModelEvents;

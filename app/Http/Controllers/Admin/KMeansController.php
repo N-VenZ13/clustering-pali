@@ -13,19 +13,24 @@ class KMeansController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil semua tahun unik yang ada di database
-        $list_tahun = Indikator::select('tahun_data')->distinct()->orderBy('tahun_data', 'desc')->pluck('tahun_data')->toArray();
+        // 1. Ambil tahun-tahun yang sudah ada di database
+        $db_years = Indikator::select('tahun_data')->distinct()->pluck('tahun_data')->toArray();
+        
+        // 2. Buat daftar tahun default (Misal dari 2020 sampai tahun depan)
+        $current_year = (int) date('Y');
+        $default_years = range($current_year + 1, 2020); // Menghasilkan array [2027, 2026, 2025 ... 2020]
 
-        // Jika database masih kosong sama sekali, beri default tahun sekarang
-        if (empty($list_tahun)) {
-            $list_tahun = [date('Y')];
-        }
+        // 3. Gabungkan tahun dari DB dan tahun default, lalu hapus duplikatnya
+        $list_tahun = array_unique(array_merge($db_years, $default_years));
+        rsort($list_tahun); // Urutkan dari tahun terbaru ke terlama
 
-        // 2. Tahun aktif = Tahun dari request, ATAU tahun terbaru dari database
-        $tahun_aktif = $request->tahun ?? $list_tahun[0];
+        // 4. Tahun aktif = Tahun dari request, atau tahun saat ini
+        $tahun_aktif = $request->tahun ?? $current_year;
 
+        // Ambil data untuk tabel
         $data_desa = Indikator::with('desa')->where('tahun_data', $tahun_aktif)->get();
 
+        // Hitung summary
         $summary = [
             'klaster_1' => $data_desa->where('klaster_hasil', 1)->count(),
             'klaster_2' => $data_desa->where('klaster_hasil', 2)->count(),
@@ -33,8 +38,10 @@ class KMeansController extends Controller
             'total' => $data_desa->count()
         ];
 
-        // Kirim $list_tahun ke view
-        return view('admin.kmeans.index', compact('data_desa', 'tahun_aktif', 'summary', 'list_tahun'));
+        // TAMBAHKAN BARIS INI: Cek status laporan tahun aktif
+        $laporan_aktif = \App\Models\Laporan::where('tahun', $tahun_aktif)->first();
+
+        return view('admin.kmeans.index', compact('data_desa', 'tahun_aktif', 'summary', 'list_tahun', 'laporan_aktif'));
     }
 
 
@@ -74,23 +81,62 @@ class KMeansController extends Controller
     {
         $tahun = $request->tahun;
 
-        // 1. Cek apakah laporan tahun ini sudah di-ACC Pimpinan?
         $laporan = \App\Models\Laporan::where('tahun', $tahun)->first();
-
         if ($laporan && $laporan->status === 'accepted') {
-            return redirect()->back()->with('error', 'DATA TERKUNCI! Laporan tahun ' . $tahun . ' sudah disetujui Pimpinan dan tidak bisa diubah lagi.');
+            return redirect()->back()->with('error', 'DATA TERKUNCI! Laporan tahun ' . $tahun . ' sudah disetujui Pimpinan.');
         }
 
-        // 2. Jika belum terkunci, Buat atau Update Laporan jadi 'Pending' (Menunggu ACC)
+        // Buat atau Update Laporan jadi 'Pending'
         \App\Models\Laporan::updateOrCreate(
             ['tahun' => $tahun],
-            ['status' => 'pending'] // Naik ke meja pimpinan
+            ['status' => 'pending']
         );
 
-        // (Kita tidak perlu lagi menyimpan agregasi ke tabel Kecamatan.
-        // Nanti agregasi akan kita hitung secara dinamis (on the fly) saat Pimpinan / Peta memanggilnya,
-        // Ini adalah Best Practice database agar tidak ada redundansi data).
+        return redirect()->route('laporan.index')->with('success', 'Agregasi K-Means menggunakan metode Modus berhasil! Laporan tahun ' . $tahun . ' telah diajukan ke Pimpinan.');
+    }
 
-        return redirect()->route('laporan.index')->with('success', 'Agregasi K-Means berhasil! Laporan tahun ' . $tahun . ' telah diajukan ke Pimpinan.');
+    // public function simpanAgregasi(Request $request)
+    // {
+    //     $tahun = $request->tahun;
+
+    //     // 1. Cek apakah laporan tahun ini sudah di-ACC Pimpinan?
+    //     $laporan = \App\Models\Laporan::where('tahun', $tahun)->first();
+
+    //     if ($laporan && $laporan->status === 'accepted') {
+    //         return redirect()->back()->with('error', 'DATA TERKUNCI! Laporan tahun ' . $tahun . ' sudah disetujui Pimpinan dan tidak bisa diubah lagi.');
+    //     }
+
+    //     // 2. Jika belum terkunci, Buat atau Update Laporan jadi 'Pending' (Menunggu ACC)
+    //     \App\Models\Laporan::updateOrCreate(
+    //         ['tahun' => $tahun],
+    //         ['status' => 'pending'] // Naik ke meja pimpinan
+    //     );
+
+    //     // (Kita tidak perlu lagi menyimpan agregasi ke tabel Kecamatan.
+    //     // Nanti agregasi akan kita hitung secara dinamis (on the fly) saat Pimpinan / Peta memanggilnya,
+    //     // Ini adalah Best Practice database agar tidak ada redundansi data).
+
+    //     return redirect()->route('laporan.index')->with('success', 'Agregasi K-Means berhasil! Laporan tahun ' . $tahun . ' telah diajukan ke Pimpinan.');
+    // }
+
+    public function resetData(Request $request)
+    {
+        $tahun = $request->tahun;
+
+        // Cek apakah Laporan sudah di-ACC Pimpinan (Jika ya, data tidak boleh dihapus!)
+        $laporan = \App\Models\Laporan::where('tahun', $tahun)->first();
+        if ($laporan && $laporan->status === 'accepted') {
+            return redirect()->back()->with('error', 'Gagal mereset data! Laporan tahun ' . $tahun . ' sudah disetujui Pimpinan dan terkunci permanen.');
+        }
+
+        // Hapus SEMUA data indikator pada tahun tersebut
+        \App\Models\Indikator::where('tahun_data', $tahun)->delete();
+
+        // Hapus draf laporan tahun tersebut (jika ada) agar bersih total
+        if ($laporan) {
+            $laporan->delete();
+        }
+
+        return redirect()->back()->with('success', 'Data Indikator tahun ' . $tahun . ' berhasil DIBERSIHKAN. Anda bisa meng-upload ulang file Excel yang benar.');
     }
 }

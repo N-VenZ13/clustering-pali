@@ -6,35 +6,66 @@ use App\Models\Indikator;
 
 class KMeansService
 {
-    // 8 Variabel kita
-    protected $columns = [
-        'listrik_pln',
-        'fasilitas_ekonomi',
-        'fasilitas_pendidikan',
-        'akses_sma',
-        'faskes_desa',
-        'akses_puskesmas',
-        'kualitas_sinyal',
-        'keamanan_bencana'
+    // Kolom asli dari database
+    protected $rawColumns = [
+        'listrik_pln', 'fasilitas_ekonomi', 'fasilitas_pendidikan',
+        'akses_sma', 'faskes_desa', 'akses_puskesmas',
+        'kualitas_sinyal', 'keamanan_bencana'
+    ];
+
+    // Kolom setelah di-invers (Siap untuk Min-Max)
+    protected $processColumns = [
+        'listrik_pln', 'fasilitas_ekonomi', 'fasilitas_pendidikan',
+        'skor_akses_sma', 'faskes_desa', 'skor_akses_puskesmas',
+        'skor_kualitas_sinyal', 'keamanan_bencana'
     ];
 
     public function process($tahun)
     {
         $data = Indikator::where('tahun_data', $tahun)->get();
 
-        // K-Means butuh minimal 3 data untuk K=3
         if ($data->count() < 3) {
-            return false;
+            return false; 
         }
 
-        // 1. Normalisasi Min-Max (0-1)
+        // ==========================================
+        // 1. PRE-PROCESSING (LOGIKA INVERS)
+        // ==========================================
+        $maxSma = $data->max('akses_sma');
+        $maxPuskesmas = $data->max('akses_puskesmas');
+
+        foreach ($data as $row) {
+            // Jarak dibalik: Jarak Terjauh - Jarak Desa Ini (Makin dekat = Skor makin tinggi)
+            $row->skor_akses_sma = $maxSma - $row->akses_sma;
+            $row->skor_akses_puskesmas = $maxPuskesmas - $row->akses_puskesmas;
+            
+            // Sinyal dibalik: 5 - Sinyal (Misal sinyal 1(bagus) -> 5-1 = 4 (Skor Tinggi))
+            $row->skor_kualitas_sinyal = 5 - $row->kualitas_sinyal;
+        }
+
+        // ==========================================
+        // 2. NORMALISASI MIN-MAX (Berdasarkan $processColumns)
+        // ==========================================
         $normalizedData = $this->normalize($data);
 
-        // 2. Inisialisasi 3 Centroid Awal (Random dari data)
+        // 3. INISIALISASI CENTROID DETERMINISTIK (ANTI-ACAK)
+        // ==========================================
+        // Agar hasil 100% konsisten tiap kali dijalankan, kita tidak memakai array_rand().
+        // Kita urutkan data dari yang terbaik ke terburuk, lalu ambil Ujung Atas, Tengah, dan Ujung Bawah.
+        
+        $sortedForInit = $normalizedData;
+        usort($sortedForInit, function($a, $b) {
+            $rataA = array_sum($a) / count($a);
+            $rataB = array_sum($b) / count($b);
+            return $rataB <=> $rataA; // Descending
+        });
+
+        $countData = count($sortedForInit);
+        
         $centroids = [
-            $normalizedData[array_rand($normalizedData)],
-            $normalizedData[array_rand($normalizedData)],
-            $normalizedData[array_rand($normalizedData)]
+            $sortedForInit[0],                                 // Centroid 1: Desa dengan nilai paling tinggi
+            $sortedForInit[(int) floor($countData / 2)],       // Centroid 2: Desa dengan nilai tepat di tengah (Median)
+            $sortedForInit[$countData - 1]                     // Centroid 3: Desa dengan nilai paling rendah
         ];
 
         $clusters = [];
@@ -42,33 +73,28 @@ class KMeansService
         $maxIterations = 100;
         $iteration = 0;
 
-        // 3. Iterasi K-Means
+        // 4. ITERASI K-MEANS
         while (!$isConverged && $iteration < $maxIterations) {
-            $newClusters = [[], [], []]; // Index 0, 1, 2
+            $newClusters = [[], [], []];
 
-            // Hitung Jarak Euclidean & Masukkan ke klaster terdekat
             foreach ($normalizedData as $index => $item) {
                 $distances = [];
                 foreach ($centroids as $cIndex => $centroid) {
                     $distances[$cIndex] = $this->euclideanDistance($item, $centroid);
                 }
-
-                // Cari jarak terpendek
                 $closestCentroidIndex = array_search(min($distances), $distances);
                 $newClusters[$closestCentroidIndex][] = $index;
             }
 
-            // Hitung Centroid Baru (Rata-rata dari anggota klasternya)
             $newCentroids = [];
             foreach ($newClusters as $cIndex => $clusterMembers) {
                 if (count($clusterMembers) > 0) {
                     $newCentroids[$cIndex] = $this->calculateMean($normalizedData, $clusterMembers);
                 } else {
-                    $newCentroids[$cIndex] = $centroids[$cIndex]; // Tetap jika kosong
+                    $newCentroids[$cIndex] = $centroids[$cIndex];
                 }
             }
 
-            // Cek Konvergensi (Apakah centroid berubah?)
             if ($centroids === $newCentroids) {
                 $isConverged = true;
             }
@@ -78,16 +104,16 @@ class KMeansService
             $iteration++;
         }
 
-        // 4. PENENTUAN LABEL (Sejahtera / Berkembang / Perlu Perhatian)
-        // Hitung rata-rata nilai tiap centroid untuk di-ranking
+        // ==========================================
+        // 5. MEMBERI NAMA KLASTER (Makin Tinggi Rata2 = Sejahtera)
+        // ==========================================
         $centroidScores = [];
         foreach ($centroids as $cIndex => $centroid) {
-            $centroidScores[$cIndex] = array_sum($centroid) / count($this->columns);
+            $centroidScores[$cIndex] = array_sum($centroid) / count($this->processColumns);
         }
 
-        // Sortir Descending (Nilai tertinggi = Sejahtera)
-        arsort($centroidScores);
-
+        arsort($centroidScores); // Urutkan dari nilai tertinggi ke terendah
+        
         $clusterLabels = [];
         $rank = 1; // 1: Sejahtera, 2: Berkembang, 3: Perhatian
         foreach ($centroidScores as $cIndex => $score) {
@@ -95,7 +121,7 @@ class KMeansService
             $rank++;
         }
 
-        // 5. Simpan Hasil ke Database
+        // 6. Simpan Hasil ke Database
         foreach ($clusters as $cIndex => $members) {
             $label = $clusterLabels[$cIndex];
             foreach ($members as $dataIndex) {
@@ -108,23 +134,20 @@ class KMeansService
     }
 
     // --- FUNGSI MATEMATIKA ---
-
     private function normalize($data)
     {
         $minMax = [];
-        // Cari nilai Min dan Max tiap kolom
-        foreach ($this->columns as $col) {
+        foreach ($this->processColumns as $col) {
             $minMax[$col] = ['min' => $data->min($col), 'max' => $data->max($col)];
         }
 
         $normalized = [];
         foreach ($data as $row) {
             $normRow = [];
-            foreach ($this->columns as $col) {
+            foreach ($this->processColumns as $col) {
                 $val = $row->$col;
                 $min = $minMax[$col]['min'];
                 $max = $minMax[$col]['max'];
-                // Rumus Min-Max
                 $normRow[$col] = ($max - $min) == 0 ? 0 : ($val - $min) / ($max - $min);
             }
             $normalized[] = $normRow;
@@ -135,7 +158,7 @@ class KMeansService
     private function euclideanDistance($pointA, $pointB)
     {
         $sum = 0;
-        foreach ($this->columns as $col) {
+        foreach ($this->processColumns as $col) {
             $sum += pow($pointA[$col] - $pointB[$col], 2);
         }
         return sqrt($sum);
@@ -144,7 +167,7 @@ class KMeansService
     private function calculateMean($normalizedData, $members)
     {
         $mean = [];
-        foreach ($this->columns as $col) {
+        foreach ($this->processColumns as $col) {
             $sum = 0;
             foreach ($members as $index) {
                 $sum += $normalizedData[$index][$col];

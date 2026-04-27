@@ -29,27 +29,30 @@ class FrontController extends Controller
             $q->where('tahun_data', $tahun_aktif);
         }])->get();
 
-        // 3. Hitung Agregasi Status Kecamatan On The Fly
+        // Hitung Agregasi Status Kecamatan On The Fly (Metode MODUS)
         foreach ($kecamatans as $kecamatan) {
-            $totalSkor = 0;
+            $klaster_counts = [1 => 0, 2 => 0, 3 => 0];
             $jmlDesa = 0;
+
             foreach ($kecamatan->desas as $desa) {
                 $ind = $desa->indikators->first();
                 if ($ind && $ind->klaster_hasil) {
-                    $totalSkor += $ind->klaster_hasil;
+                    $klaster_counts[$ind->klaster_hasil]++;
                     $jmlDesa++;
                 }
             }
 
             if ($jmlDesa > 0) {
-                $rataRata = $totalSkor / $jmlDesa;
-                if ($rataRata < 1.67) $status = 'Sejahtera';
-                elseif ($rataRata <= 2.33) $status = 'Berkembang';
+                // Cari Modus (Key array dengan value/jumlah tertinggi)
+                $modus_klaster = array_keys($klaster_counts, max($klaster_counts))[0];
+
+                if ($modus_klaster == 1) $status = 'Sejahtera';
+                elseif ($modus_klaster == 2) $status = 'Berkembang';
                 else $status = 'Perlu Perhatian';
 
-                // Tempelkan secara virtual untuk dikirim ke WebGIS
                 $kecamatan->status_akhir = $status;
-                $kecamatan->skor_agregasi = round($rataRata, 2);
+                // Untuk Modus, skor agregasi bisa kita ubah jadi persentase dominasi
+                $kecamatan->skor_agregasi = round((max($klaster_counts) / $jmlDesa) * 100, 2) . '%';
             } else {
                 $kecamatan->status_akhir = null;
             }

@@ -34,34 +34,32 @@ class LaporanController extends Controller
 
         $summary = ['sejahtera' => 0, 'berkembang' => 0, 'perhatian' => 0];
 
+        // Hitung Agregasi Status Kecamatan On The Fly (Metode MODUS)
         foreach ($kecamatans as $kecamatan) {
-            $totalSkor = 0;
+            $klaster_counts = [1 => 0, 2 => 0, 3 => 0];
             $jmlDesa = 0;
+
             foreach ($kecamatan->desas as $desa) {
                 $ind = $desa->indikators->first();
                 if ($ind && $ind->klaster_hasil) {
-                    $totalSkor += $ind->klaster_hasil;
+                    $klaster_counts[$ind->klaster_hasil]++;
                     $jmlDesa++;
                 }
             }
 
             if ($jmlDesa > 0) {
-                $rataRata = $totalSkor / $jmlDesa;
-                if ($rataRata < 1.67) {
-                    $status = 'Sejahtera';
-                    $summary['sejahtera']++;
-                } elseif ($rataRata <= 2.33) {
-                    $status = 'Berkembang';
-                    $summary['berkembang']++;
-                } else {
-                    $status = 'Perlu Perhatian';
-                    $summary['perhatian']++;
-                }
+                // Cari Modus (Key array dengan value/jumlah tertinggi)
+                $modus_klaster = array_keys($klaster_counts, max($klaster_counts))[0];
+
+                if ($modus_klaster == 1) $status = 'Sejahtera';
+                elseif ($modus_klaster == 2) $status = 'Berkembang';
+                else $status = 'Perlu Perhatian';
+
                 $kecamatan->status_akhir = $status;
-                $kecamatan->skor_agregasi = round($rataRata, 2);
+                // Untuk Modus, skor agregasi bisa kita ubah jadi persentase dominasi
+                $kecamatan->skor_agregasi = round((max($klaster_counts) / $jmlDesa) * 100, 2) . '%';
             } else {
-                $kecamatan->status_akhir = '-';
-                $kecamatan->skor_agregasi = '-';
+                $kecamatan->status_akhir = null;
             }
         }
 
@@ -74,17 +72,19 @@ class LaporanController extends Controller
     {
         $request->validate([
             'tahun' => 'required',
-            'status' => 'required|in:accepted,rejected'
+            'status' => 'required|in:accepted,rejected',
+            'catatan' => 'nullable|string' // Validasi catatan tambahan
         ]);
 
         $laporan = Laporan::where('tahun', $request->tahun)->firstOrFail();
 
         $laporan->update([
             'status' => $request->status,
+            'catatan_pimpinan' => $request->status == 'rejected' ? $request->catatan : null,
             'dikunci_pada' => $request->status == 'accepted' ? now() : null
         ]);
 
-        $pesan = $request->status == 'accepted' ? 'Laporan DITERIMA! Peta Publik kini diperbarui.' : 'Laporan DITOLAK! Admin kini bisa merevisi data.';
+        $pesan = $request->status == 'accepted' ? 'Laporan DITERIMA! Peta Publik kini diperbarui.' : 'Laporan DITOLAK! Catatan telah dikirim ke Admin.';
         return redirect()->back()->with('success', $pesan);
     }
 }

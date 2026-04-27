@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Laporan extends Model
 {
-    protected $fillable = ['tahun', 'status', 'dikunci_pada'];
+    protected $fillable = ['tahun', 'status', 'catatan_pimpinan', 'dikunci_pada'];
 }

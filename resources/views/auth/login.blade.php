@@ -62,15 +62,16 @@
             <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
             
             <div class="relative z-10 text-center flex flex-col items-center">
-                <!-- Ganti dengan Logo BPS / PALI nanti -->
-                <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-center mb-8 shadow-2xl shadow-blue-900/50">
-                    <span class="text-4xl font-black text-white">P</span>
+                <!-- Logo BPS -->
+                <div class="w-28 h-28 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 flex items-center justify-center mb-8 shadow-2xl shadow-blue-800/50">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo BPS" class="w-full h-full object-contain drop-shadow-md">
                 </div>
                 
                 <h1 class="text-3xl font-bold text-white mb-2 leading-tight">Sistem Pemetaan<br>Kesejahteraan Sosial</h1>
                 <div class="w-16 h-1 bg-[#F97316] rounded-full mx-auto my-6"></div>
+                <p class="text-blue-100 font-medium tracking-wide">Badan Pusat Statistik</p>
                 <p class="text-blue-100 font-medium tracking-wide">Kabupaten Penukal Abab Lematang Ilir</p>
-                <p class="text-blue-200/60 text-sm mt-1">Menggunakan Algoritma K-Means</p>
+                <!-- <p class="text-blue-200/60 text-sm mt-1">Menggunakan Algoritma K-Means</p> -->
             </div>
         </div>
 
