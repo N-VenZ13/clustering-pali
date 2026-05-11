@@ -95,8 +95,8 @@
 
     <!-- KOP SURAT -->
     <div class="flex items-center gap-6 border-b-4 border-double border-[#1E293B] pb-6 mb-8 relative z-10">
-        <div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center shrink-0">
-            <span class="text-xs text-slate-500">Logo</span>
+        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shrink-0">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" >
         </div>
         <div>
             <h1 class="text-2xl font-bold text-[#1E293B] uppercase tracking-wide">LAPORAN PEMETAAN KESEJAHTERAAN SOSIAL</h1>
@@ -179,6 +179,10 @@
             <p class="font-bold text-[#1E293B] underline">Ir. Budi Santoso, M.Si</p>
             <p class="text-sm text-[#1E293B]">NIP. 19780101 200501 1 001</p>
         </div>
+    </div>
+
+    <div class="absolute bottom-6 left-12 text-[10px] text-gray-400 font-mono">
+            Dokumen di-generate oleh Sistem WebGIS PALI pada: {{ now()->format('d M Y - H:i:s') }} WIB
     </div>
 
 </div>

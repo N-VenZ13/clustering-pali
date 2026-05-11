@@ -64,6 +64,9 @@ Route::post('/kmeans/agregasi', [KMeansController::class, 'simpanAgregasi'])->na
 // Route untuk reset data indikator
 Route::delete('/kmeans/reset', [KMeansController::class, 'resetData'])->name('kmeans.reset');
 
+// Route untuk melihat log perhitungan
+Route::get('/kmeans/log', [KMeansController::class, 'logPerhitungan'])->name('kmeans.log');
+
 // Route untuk edit indikator manual
 Route::get('/indikator/{id}/edit', [IndikatorController::class, 'edit'])->name('indikator.edit');
 
@@ -83,5 +86,8 @@ Route::post('/laporan/status', [LaporanController::class, 'updateStatus'])
 
 // Route untuk halaman depan (public)
 Route::get('/', [FrontController::class, 'index'])->name('home');
+
+Route::get('/metadata', [FrontController::class, 'metadata'])->name('publik.metadata');
+Route::get('/panduan', [FrontController::class, 'panduan'])->name('publik.panduan');
 
 require __DIR__ . '/auth.php';

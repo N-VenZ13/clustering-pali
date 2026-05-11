@@ -139,4 +139,18 @@ class KMeansController extends Controller
 
         return redirect()->back()->with('success', 'Data Indikator tahun ' . $tahun . ' berhasil DIBERSIHKAN. Anda bisa meng-upload ulang file Excel yang benar.');
     }
+
+    public function logPerhitungan(Request $request, \App\Services\KMeansService $kMeansService)
+    {
+        $tahun = $request->tahun ?? date('Y');
+        
+        // Panggil fungsi khusus pembuat Log dari Service
+        $logData = $kMeansService->getCalculationLog($tahun);
+
+        if (!$logData) {
+            return redirect()->route('kmeans.index')->with('error', 'Tidak dapat menampilkan log. Data desa kurang atau belum diinput untuk tahun ' . $tahun);
+        }
+
+        return view('admin.kmeans.log', compact('logData', 'tahun'));
+    }
 }

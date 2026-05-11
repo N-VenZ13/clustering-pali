@@ -65,31 +65,37 @@
 </div>
 
 <!-- BANNER STATUS LAPORAN (Khusus jika ditolak/menunggu) -->
-    @if(isset($laporan_aktif))
-        @if($laporan_aktif->status === 'rejected')
-            <div class="mb-6 p-4 rounded-xl bg-red-100 border-2 border-red-300 flex items-start gap-4 shadow-sm animate-pulse">
-                <div class="p-2 bg-red-500 rounded-full text-white shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
-                <div>
-                    <h4 class="text-red-800 font-bold text-lg">LAPORAN DITOLAK PIMPINAN!</h4>
-                    <p class="text-red-700 text-sm mt-1 mb-3">Laporan tahun {{ $tahun_aktif }} ditolak oleh Pimpinan. Silakan lakukan perbaikan data</p>
-                </div>
-                <div class="bg-white/60 p-3 rounded-lg border border-red-100">
-                        <span class="text-xs font-bold uppercase text-red-800 tracking-wider">Catatan Pimpinan:</span>
-                        <p class="text-sm font-medium text-[#1E293B] mt-1 italic">"{{ $laporan_aktif->catatan_pimpinan ?? 'Tidak ada catatan khusus.' }}"</p>
-                    </div>
-            </div>
-        @elseif($laporan_aktif->status === 'pending')
-            <div class="mb-6 p-4 rounded-xl bg-yellow-50 border border-yellow-200 flex items-center gap-3 shadow-sm">
-                <svg class="w-6 h-6 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <p class="text-yellow-800 text-sm font-medium">Laporan tahun {{ $tahun_aktif }} sedang berada di meja Pimpinan (Menunggu Persetujuan). Anda tidak bisa menghapus data saat ini.</p>
-            </div>
-        @elseif($laporan_aktif->status === 'accepted')
-            <div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3 shadow-sm">
-                <svg class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <p class="text-green-800 text-sm font-bold">Laporan tahun {{ $tahun_aktif }} sudah DISETUJUI dan DIKUNCI! Peta sudah tayang di halaman publik.</p>
-            </div>
-        @endif
-    @endif
+@if(isset($laporan_aktif))
+@if($laporan_aktif->status === 'rejected')
+<div class="mb-6 p-4 rounded-xl bg-red-100 border-2 border-red-300 flex items-start gap-4 shadow-sm animate-pulse">
+    <div class="p-2 bg-red-500 rounded-full text-white shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg></div>
+    <div>
+        <h4 class="text-red-800 font-bold text-lg">LAPORAN DITOLAK PIMPINAN!</h4>
+        <p class="text-red-700 text-sm mt-1 mb-3">Laporan tahun {{ $tahun_aktif }} ditolak oleh Pimpinan. Silakan lakukan perbaikan data</p>
+    </div>
+    <div class="bg-white/60 p-3 rounded-lg border border-red-100">
+        <span class="text-xs font-bold uppercase text-red-800 tracking-wider">Catatan Pimpinan:</span>
+        <p class="text-sm font-medium text-[#1E293B] mt-1 italic">"{{ $laporan_aktif->catatan_pimpinan ?? 'Tidak ada catatan khusus.' }}"</p>
+    </div>
+</div>
+@elseif($laporan_aktif->status === 'pending')
+<div class="mb-6 p-4 rounded-xl bg-yellow-50 border border-yellow-200 flex items-center gap-3 shadow-sm">
+    <svg class="w-6 h-6 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <p class="text-yellow-800 text-sm font-medium">Laporan tahun {{ $tahun_aktif }} sedang berada di meja Pimpinan (Menunggu Persetujuan). Anda tidak bisa menghapus data saat ini.</p>
+</div>
+@elseif($laporan_aktif->status === 'accepted')
+<div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3 shadow-sm">
+    <svg class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <p class="text-green-800 text-sm font-bold">Laporan tahun {{ $tahun_aktif }} sudah DISETUJUI dan DIKUNCI! Peta sudah tayang di halaman publik.</p>
+</div>
+@endif
+@endif
 
 <!-- SUMMARY CARDS (Tengah) -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -114,6 +120,16 @@
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_3'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
         </div>
     </div>
+</div>
+
+<!-- Tombol Lihat Log Perhitungan -->
+<div class="mb-6 flex justify-end">
+    <a href="{{ route('kmeans.log', ['tahun' => $tahun_aktif]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-4 py-2 rounded-lg transition border border-blue-100">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Lihat Log Perhitungan
+    </a>
 </div>
 
 <!-- DATA TABLE (Bawah) -->
