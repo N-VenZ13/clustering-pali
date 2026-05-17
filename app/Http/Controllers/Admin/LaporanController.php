@@ -11,10 +11,16 @@ class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil Laporan Tahun Terbaru, ATAU sesuai pilihan dropdown
-        $laporan_terbaru = Laporan::orderBy('tahun', 'desc')->first();
-        $tahun_aktif = $request->tahun ?? ($laporan_terbaru ? $laporan_terbaru->tahun : date('Y'));
+        // 1. Ambil tahun laporan (Jika kosong, buat dummy 5 tahun mundur)
+        $db_years = Laporan::orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+        $current_year = (int) date('Y');
+        $dummy_years = range($current_year, $current_year - 4); 
+        
+        $list_tahun = array_unique(array_merge($db_years, $dummy_years));
+        rsort($list_tahun);
 
+        $tahun_aktif = $request->tahun ?? $list_tahun[0];
+        
         $laporan_aktif = Laporan::where('tahun', $tahun_aktif)->first();
         $status_dokumen = $laporan_aktif ? $laporan_aktif->status : 'belum_ada';
 
@@ -23,7 +29,7 @@ class LaporanController extends Controller
             return view('admin.laporan.index', [
                 'status_dokumen' => 'belum_ada',
                 'tahun_aktif' => $tahun_aktif,
-                'list_tahun' => Laporan::pluck('tahun')->toArray()
+                'list_tahun' => $list_tahun // PERBAIKAN: Gunakan $list_tahun yang digabung di atas
             ]);
         }
 
@@ -63,7 +69,7 @@ class LaporanController extends Controller
             }
         }
 
-        $list_tahun = Laporan::orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+        // PERBAIKAN: Hapus baris penimpa $list_tahun di sini
 
         return view('admin.laporan.index', compact('kecamatans', 'summary', 'status_dokumen', 'tahun_aktif', 'list_tahun', 'laporan_aktif'));
     }

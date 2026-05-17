@@ -79,17 +79,34 @@
         <p class="text-slate-700 text-sm mb-4">Untuk menghindari hasil yang berubah-ubah (Inkonsisten), sistem menggunakan metode <i>Deterministic Initialization</i>. Sistem mencari nilai rata-rata tiap baris data, lalu mengambil data dengan Ranking 1 (Tertinggi), Median (Tengah), dan Terendah sebagai Centroid awal.</p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Centroid 1 -->
+            @php $c1 = $logData['initial_centroids'][0]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 1 (Tertinggi)</p>
-                <p class="text-xs text-slate-500">Nilai Array dari Desa Ranking 1 digunakan sebagai titik pusat awal klaster pertama.</p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-800">{{ $c1['_nama_desa'] }}</b></p>
+                <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
+                    [ {{ number_format($c1['listrik_pln'] ?? 0, 2) }}, {{ number_format($c1['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c1['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c1['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c1['faskes_desa'] ?? 0, 2) }}, {{ number_format($c1['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c1['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c1['keamanan_bencana'] ?? 0, 2) }} ]
+                </div>
             </div>
+
+            <!-- Centroid 2 -->
+            @php $c2 = $logData['initial_centroids'][1]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 2 (Median)</p>
-                <p class="text-xs text-slate-500">Nilai Array dari Desa Ranking Tengah digunakan sebagai titik pusat klaster kedua.</p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-600">{{ $c2['_nama_desa'] }}</b></p>
+                <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
+                    [ {{ number_format($c2['listrik_pln'] ?? 0, 2) }}, {{ number_format($c2['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c2['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c2['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c2['faskes_desa'] ?? 0, 2) }}, {{ number_format($c2['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c2['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c2['keamanan_bencana'] ?? 0, 2) }} ]
+                </div>
             </div>
+
+            <!-- Centroid 3 -->
+            @php $c3 = $logData['initial_centroids'][2]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 3 (Terendah)</p>
-                <p class="text-xs text-slate-500">Nilai Array dari Desa Ranking Bawah digunakan sebagai titik pusat klaster ketiga.</p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-300">{{ $c3['_nama_desa'] }}</b></p>
+                <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
+                    [ {{ number_format($c3['listrik_pln'] ?? 0, 2) }}, {{ number_format($c3['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c3['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c3['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c3['faskes_desa'] ?? 0, 2) }}, {{ number_format($c3['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c3['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c3['keamanan_bencana'] ?? 0, 2) }} ]
+                </div>
             </div>
         </div>
     </div>

@@ -63,6 +63,7 @@
                     <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard</span>
                 </a>
 
+                @if(Auth::user()->role === 'admin')
                 <!-- Menu Data Wilayah -->
                 <a href="{{ route('wilayah.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg transition group {{ request()->routeIs('wilayah.*', 'kecamatan.*', 'desa.*') ? 'bg-white/10 text-white font-medium' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white' }}" title="Data Wilayah">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,6 +71,7 @@
                     </svg>
                     <span x-show="sidebarOpen" class="whitespace-nowrap">Data Wilayah</span>
                 </a>
+                @endif
 
                 <!-- Menu CLUSTERING (Dropdown) -->
                 @php $isClustering = request()->routeIs('indikator.*', 'kmeans.*'); @endphp
@@ -87,18 +89,22 @@
                     </button>
 
                     <div x-show="openCluster && sidebarOpen" x-collapse class="pl-11 pr-3 space-y-1">
+                        @if(Auth::user()->role === 'admin')
                         <a href="{{ route('indikator.index') }}" class="block px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('indikator.*') ? 'bg-white/20 text-white font-bold' : 'text-[#CBD5E1] hover:bg-white/10 hover:text-white' }}">Kamus Indikator</a>
-                        <a href="{{ route('kmeans.index') }}" class="block px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('kmeans.*') ? 'bg-white/20 text-white font-bold' : 'text-[#CBD5E1] hover:bg-white/10 hover:text-white' }}">Proses K-Means</a>
+                        @endif
+                        <a href="{{ route('kmeans.index') }}" class="block px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('kmeans.*') ? 'bg-white/20 text-white font-bold' : 'text-[#CBD5E1] hover:bg-white/10 hover:text-white' }}">Data K-Means</a>
                     </div>
                 </div>
 
                 <!-- Menu Data User -->
+                 @if(Auth::user()->role === 'admin')
                 <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg transition group {{ request()->routeIs('users.*') ? 'bg-white/10 text-white font-medium' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white' }}" title="Data User">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                     <span x-show="sidebarOpen" class="whitespace-nowrap">Data User</span>
                 </a>
+                @endif
 
                 <!-- Menu Laporan -->
                 <a href="{{ route('laporan.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg transition group {{ request()->routeIs('laporan.*') ? 'bg-white/10 text-white font-medium' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white' }}" title="Laporan">

@@ -138,7 +138,6 @@ class KMeansService
     {
         $minMax = [];
         foreach ($this->processColumns as $col) {
-            // Gunakan Arrow Function di sini juga
             $minMax[$col] = [
                 'min' => $data->min(fn($item) => $item->{$col}), 
                 'max' => $data->max(fn($item) => $item->{$col})
@@ -148,6 +147,10 @@ class KMeansService
         $normalized = [];
         foreach ($data as $row) {
             $normRow = [];
+            
+            // --- TAMBAHAN KITA: Bawa nama desanya ---
+            $normRow['_nama_desa'] = $row->desa->nama_desa; 
+            
             foreach ($this->processColumns as $col) {
                 $val = $row->$col;
                 $min = $minMax[$col]['min'];
@@ -235,6 +238,9 @@ class KMeansService
             $sortedForInit[$countData - 1]
         ];
         
+        // PASTIKAN BARIS INI ADA:
+        $log['initial_centroids'] = $centroids;
+
         // 5. Jalankan Iterasi
         $clusters = [];
         $isConverged = false;

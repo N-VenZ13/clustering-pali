@@ -7,15 +7,18 @@
             <div class="space-y-6 mb-8">
                 <div>
                     <label class="block text-sm font-semibold text-[#1E293B] mb-2">Nama Lengkap</label>
-                    <input type="text" name="name" required class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    <input type="text" name="name" value="{{ old('name') }}" class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    @error('name') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1E293B] mb-2">Username</label>
-                    <input type="text" name="username" required class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    <input type="text" name="username" value="{{ old('username') }}" class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    @error('username') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1E293B] mb-2">Password</label>
-                    <input type="password" name="password" required class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    <input type="password" name="password" class="w-full border-gray-200 rounded-lg focus:ring-[#1E3A8A]">
+                    @error('password') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1E293B] mb-2">Hak Akses (Role)</label>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\KMeansController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -90,4 +91,23 @@ Route::get('/', [FrontController::class, 'index'])->name('home');
 Route::get('/metadata', [FrontController::class, 'metadata'])->name('publik.metadata');
 Route::get('/panduan', [FrontController::class, 'panduan'])->name('publik.panduan');
 
-require __DIR__ . '/auth.php';
+// require __DIR__ . '/auth.php';
+
+// 1. URL Rahasia untuk Admin
+Route::middleware('guest')->group(function () {
+    // Ubah URL di bawah ini sesuai selera Anda
+    Route::get('portal-bps-pali/admin-access', [AuthenticatedSessionController::class, 'create'])
+                ->name('login'); // Name route 'login' tetap dipertahankan agar sistem auth internal Laravel tidak error
+
+    Route::post('portal-bps-pali/admin-access', [AuthenticatedSessionController::class, 'store']);
+});
+
+// 2. Jika ada yang mencoba mengakses /login, lempar ke halaman utama
+Route::get('login', function() {
+    return redirect()->route('home');
+});
+
+// 3. URL Logout
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+            ->name('logout')
+            ->middleware('auth');

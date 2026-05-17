@@ -15,23 +15,23 @@
 
         <!-- Card 2: Klaster Sejahtera -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#10B981]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#14532d]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Klaster Sejahtera</p>
-            <h3 class="text-4xl font-bold text-[#10B981] ml-2">{{ $summary['sejahtera'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#14532d] ml-2">{{ $summary['sejahtera'] }}</h3>
         </div>
 
         <!-- Card 3: Klaster Berkembang -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F59E0B]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#22c55e]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Klaster Berkembang</p>
-            <h3 class="text-4xl font-bold text-[#F59E0B] ml-2">{{ $summary['berkembang'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#22c55e] ml-2">{{ $summary['berkembang'] }}</h3>
         </div>
 
         <!-- Card 4: Perlu Perhatian -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EF4444]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#bbf7d0]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Perlu Perhatian</p>
-            <h3 class="text-4xl font-bold text-[#EF4444] ml-2">{{ $summary['perhatian'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#bbf7d0] ml-2">{{ $summary['perhatian'] }}</h3>
         </div>
 
     </div>
@@ -112,7 +112,7 @@
                             datasets: [{
                                 label: 'Jumlah Desa',
                                 data: [jmlSejahtera, jmlBerkembang, jmlPerhatian],
-                                backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                                backgroundColor: ['#14532d', '#22c55e', '#bbf7d0'],
                                 borderRadius: 6,
                                 borderWidth: 0
                             }]

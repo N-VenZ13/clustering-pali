@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'PROSES CLUSTERING K-MEANS')
+@section('title', 'DATA K-MEANS')
 
 @section('content')
 
@@ -17,6 +17,7 @@
         </select>
     </form>
 
+    @if(Auth::user()->role === 'admin')
     <!-- Aksi K-Means -->
     <div class="flex items-center gap-3 w-full lg:w-auto">
 
@@ -62,6 +63,8 @@
             </button>
         </form>
     </div>
+    @endif
+
 </div>
 
 <!-- BANNER STATUS LAPORAN (Khusus jika ditolak/menunggu) -->
@@ -100,21 +103,21 @@
 <!-- SUMMARY CARDS (Tengah) -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#10B981] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#14532d] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster I (Sejahtera)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_1'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#F59E0B] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#22c55e] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster II (Berkembang)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_2'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#EF4444] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#bbf7d0] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster III (Perlu Perhatian)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_3'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
@@ -160,7 +163,9 @@
                     <th class="px-4 py-4">Sinyal</th>
                     <th class="px-4 py-4">Bencana</th>
                     <th class="px-6 py-4 text-right font-bold text-[#1E3A8A]">Hasil Klaster</th>
+                    @if(Auth::user()->role === 'admin')
                     <th class="px-6 py-4 text-center font-bold">Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -177,15 +182,16 @@
                     <td class="px-4 py-4 text-slate-500">{{ $row->keamanan_bencana }}</td>
                     <td class="px-6 py-4 text-right">
                         @if($row->klaster_hasil == 1)
-                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#10B981]/10 text-[#10B981] font-bold rounded-md border border-[#10B981]/20">1 - Sejahtera</span>
-                        @elseif($row->klaster_hasil == 2)
-                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] font-bold rounded-md border border-[#F59E0B]/20">2 - Berkembang</span>
-                        @elseif($row->klaster_hasil == 3)
-                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] font-bold rounded-md border border-[#EF4444]/20">3 - Perhatian</span>
+                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#14532d] text-white font-bold rounded-md">1 - Sejahtera</span>
+                                @elseif($row->klaster_hasil == 2)
+                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#22c55e] text-white font-bold rounded-md">2 - Berkembang</span>
+                                @elseif($row->klaster_hasil == 3)
+                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#bbf7d0] text-green-900 font-bold rounded-md">3 - Perhatian</span>
                         @else
                         <span class="inline-block whitespace-nowrap text-slate-400 italic">- Belum Diproses -</span>
                         @endif
                     </td>
+                    @if(Auth::user()->role === 'admin')
                     <td class="px-6 py-4 text-center">
                         <a href="{{ route('indikator.edit', $row->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition" title="Edit Manual">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,6 +199,7 @@
                             </svg>
                         </a>
                     </td>
+                    @endif
                 </tr>
                 @empty
                 <tr>
@@ -212,6 +219,7 @@
     </div>
 
     <!-- TOMBOL BOTTOM-UP AGGREGATION -->
+     @if(Auth::user()->role === 'admin')
     <div class="bg-slate-50 border-t border-slate-100 p-4 flex justify-end">
         <form id="form-agregasi" action="{{ route('kmeans.agregasi') }}" method="POST">
             @csrf
@@ -241,6 +249,7 @@
             @endif
         </form>
     </div>
+    @endif
 
 </div>
 
