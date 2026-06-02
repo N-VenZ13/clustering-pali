@@ -13,18 +13,18 @@ class KMeansController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Ambil tahun-tahun yang sudah ada di database
-        $db_years = Indikator::select('tahun_data')->distinct()->pluck('tahun_data')->toArray();
+        // 1. Ambil tahun-tahun yang sudah ada di database (Mulai 2024)
+        $db_years = Indikator::where('tahun_data', '>=', 2024)
+                             ->select('tahun_data')->distinct()->pluck('tahun_data')->toArray();
         
-        // 2. Buat daftar tahun default (Misal dari 2020 sampai tahun depan)
-        $current_year = (int) date('Y');
-        $default_years = range($current_year + 1, 2020); // Menghasilkan array [2027, 2026, 2025 ... 2020]
+        // 2. Buat daftar tahun dari 2024 sampai tahun depan (Maksimal masa depan +1)
+        $current_year = max((int) date('Y'), 2024);
+        $default_years = range($current_year + 1, 2024); // Menghasilkan array [2027, 2026, 2025, 2024]
 
-        // 3. Gabungkan tahun dari DB dan tahun default, lalu hapus duplikatnya
+        // 3. Gabungkan tahun dari DB dan tahun default, hapus duplikat
         $list_tahun = array_unique(array_merge($db_years, $default_years));
-        rsort($list_tahun); // Urutkan dari tahun terbaru ke terlama
+        rsort($list_tahun);
 
-        // 4. Tahun aktif = Tahun dari request, atau tahun saat ini
         $tahun_aktif = $request->tahun ?? $current_year;
 
         // Ambil data untuk tabel
@@ -151,6 +151,48 @@ class KMeansController extends Controller
             return redirect()->route('kmeans.index')->with('error', 'Tidak dapat menampilkan log. Data desa kurang atau belum diinput untuk tahun ' . $tahun);
         }
 
-        return view('admin.kmeans.log', compact('logData', 'tahun'));
+        // HITUNG AGREGASI KECAMATAN UNTUK DITAMPILKAN DI LOG
+        // ====================================================
+        $kecamatans = \App\Models\Kecamatan::with(['desas.indikators' => function($q) use ($tahun) {
+            $q->where('tahun_data', $tahun);
+        }])->get();
+
+        $logAgregasi = [];
+        foreach ($kecamatans as $kecamatan) {
+            $jmlSejahtera = 0; $jmlBerkembang = 0; $jmlPerhatian = 0;
+            $jmlDesa = 0;
+
+            foreach ($kecamatan->desas as $desa) {
+                $ind = $desa->indikators->first();
+                if ($ind && $ind->klaster_hasil) {
+                    if ($ind->klaster_hasil == 1) $jmlSejahtera++;
+                    if ($ind->klaster_hasil == 2) $jmlBerkembang++;
+                    if ($ind->klaster_hasil == 3) $jmlPerhatian++;
+                    $jmlDesa++;
+                }
+            }
+
+            if ($jmlDesa > 0) {
+                $totalSkor = ($jmlSejahtera * 3) + ($jmlBerkembang * 2) + ($jmlPerhatian * 1);
+                $rataRata = $totalSkor / $jmlDesa;
+
+                if ($rataRata >= 2.30) $status = 'Sejahtera';
+                elseif ($rataRata >= 1.70 && $rataRata <= 2.29) $status = 'Berkembang';
+                else $status = 'Perlu Perhatian';
+
+                $logAgregasi[] = [
+                    'nama_kecamatan' => $kecamatan->nama_kecamatan,
+                    'total_desa' => $jmlDesa,
+                    's' => $jmlSejahtera,
+                    'b' => $jmlBerkembang,
+                    'p' => $jmlPerhatian,
+                    'total_skor' => $totalSkor,
+                    'rata_rata' => number_format($rataRata, 2),
+                    'status_akhir' => $status
+                ];
+            }
+        }
+
+        return view('admin.kmeans.log', compact('logData', 'tahun', 'logAgregasi'));
     }
 }

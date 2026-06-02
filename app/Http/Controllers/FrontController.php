@@ -11,16 +11,19 @@ class FrontController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. HANYA ambil tahun yang Laporannya sudah di "Accepted" oleh Pimpinan
-        // 1. Ambil tahun-tahun yang Laporannya sudah "Accepted"
-        $db_years = Laporan::where('status', 'accepted')->orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+        // 1. HANYA ambil tahun yang Laporannya sudah "Accepted" dan >= 2024
+        $db_years = Laporan::where('status', 'accepted')
+                             ->where('tahun', '>=', 2024)
+                             ->orderBy('tahun', 'desc')
+                             ->pluck('tahun')
+                             ->toArray();
         
-        // 2. Buat tahun buatan (Dummy) 5 tahun ke belakang agar dropdown tidak kosong melompong (Jika DB kosong)
-        $current_year = (int) date('Y');
-        $dummy_years = range($current_year, $current_year - 4); 
+        // 2. Buat tahun dummy dari 2024 sampai Tahun Saat Ini (Bukan tahun depan untuk publik)
+        $current_year = max((int) date('Y'), 2024);
+        $dummy_years = range($current_year, 2024); 
         
         $list_tahun = array_unique(array_merge($db_years, $dummy_years));
-        rsort($list_tahun); // Urutkan terbaru ke terlama
+        rsort($list_tahun);
 
         $tahun_aktif = $request->tahun ?? $list_tahun[0];
 
@@ -36,32 +39,44 @@ class FrontController extends Controller
             $q->where('tahun_data', $tahun_aktif);
         }])->get();
 
-        // Hitung Agregasi Status Kecamatan On The Fly (Metode MODUS)
+        // Hitung Agregasi Status Kecamatan (Metode Weighted Average / Rata-rata Tertimbang)
         foreach ($kecamatans as $kecamatan) {
-            $klaster_counts = [1 => 0, 2 => 0, 3 => 0];
+            $jmlSejahtera = 0;  // Bobot 3
+            $jmlBerkembang = 0; // Bobot 2
+            $jmlPerhatian = 0;  // Bobot 1
             $jmlDesa = 0;
 
             foreach ($kecamatan->desas as $desa) {
                 $ind = $desa->indikators->first();
                 if ($ind && $ind->klaster_hasil) {
-                    $klaster_counts[$ind->klaster_hasil]++;
+                    if ($ind->klaster_hasil == 1) $jmlSejahtera++;
+                    if ($ind->klaster_hasil == 2) $jmlBerkembang++;
+                    if ($ind->klaster_hasil == 3) $jmlPerhatian++;
                     $jmlDesa++;
                 }
             }
 
             if ($jmlDesa > 0) {
-                // Cari Modus (Key array dengan value/jumlah tertinggi)
-                $modus_klaster = array_keys($klaster_counts, max($klaster_counts))[0];
+                // Kalkulasi Total Skor (Sesuai Bab 4 Skripsi)
+                $totalSkor = ($jmlSejahtera * 3) + ($jmlBerkembang * 2) + ($jmlPerhatian * 1);
+                
+                // Kalkulasi Rata-rata
+                $rataRata = $totalSkor / $jmlDesa;
 
-                if ($modus_klaster == 1) $status = 'Sejahtera';
-                elseif ($modus_klaster == 2) $status = 'Berkembang';
-                else $status = 'Perlu Perhatian';
+                // Threshold Status
+                if ($rataRata >= 2.30) {
+                    $status = 'Sejahtera';
+                } elseif ($rataRata >= 1.70 && $rataRata <= 2.29) {
+                    $status = 'Berkembang';
+                } else {
+                    $status = 'Perlu Perhatian';
+                }
 
                 $kecamatan->status_akhir = $status;
-                // Untuk Modus, skor agregasi bisa kita ubah jadi persentase dominasi
-                $kecamatan->skor_agregasi = round((max($klaster_counts) / $jmlDesa) * 100, 2) . '%';
+                $kecamatan->skor_agregasi = number_format($rataRata, 2); // Tampilkan misal: 1.70
             } else {
                 $kecamatan->status_akhir = null;
+                $kecamatan->skor_agregasi = null;
             }
         }
 

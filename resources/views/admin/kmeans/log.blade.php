@@ -175,4 +175,66 @@
             @endforeach
         </div>
     </div>
+    <!-- TAHAP 5: AGREGASI BOTTOM-UP (Sesuai Bab 4) -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mt-6">
+        <h3 class="font-bold text-[#1E3A8A] text-lg border-b pb-2 mb-4">TAHAP 5: Agregasi Tingkat Kecamatan (Weighted Average)</h3>
+        <p class="text-slate-700 text-sm mb-4 leading-relaxed text-justify">
+            Setelah klaster tingkat desa terbentuk, sistem melakukan agregasi ke tingkat kecamatan. Sistem menetapkan bobot matematis: <b>Desa Sejahtera (Poin 3)</b>, <b>Berkembang (Poin 2)</b>, dan <b>Perlu Perhatian (Poin 1)</b>. Sistem menjumlahkan skor seluruh desa dalam satu wilayah kecamatan dan menghitung nilai rata-ratanya. 
+            <br><br><b>Ambang Batas (Threshold):</b><br>
+            • Skor <b>≥ 2.30</b> = Sejahtera<br>
+            • Skor <b>1.70 s.d 2.29</b> = Berkembang<br>
+            • Skor <b>< 1.70</b> = Perlu Perhatian
+        </p>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-center border-collapse border border-slate-200">
+                <thead class="bg-slate-100 text-slate-600">
+                    <tr>
+                        <th class="border border-slate-200 p-2 text-left" rowspan="2">Kecamatan</th>
+                        <th class="border border-slate-200 p-2" rowspan="2">Jml Desa</th>
+                        <th class="border border-slate-200 p-2" colspan="3">Komposisi Desa (S-B-P)</th>
+                        <th class="border border-slate-200 p-2 bg-blue-50 text-blue-900" rowspan="2">Perhitungan Total Skor</th>
+                        <th class="border border-slate-200 p-2 bg-yellow-50 text-yellow-900" rowspan="2">Rata-rata (Skor / Desa)</th>
+                        <th class="border border-slate-200 p-2 bg-[#1E3A8A] text-white" rowspan="2">Status Akhir</th>
+                    </tr>
+                    <tr>
+                        <th class="border border-slate-200 p-1 text-[#14532d] bg-[#14532d]/10 text-xs">Sejahtera<br>(x3)</th>
+                        <th class="border border-slate-200 p-1 text-[#22c55e] bg-[#22c55e]/10 text-xs">Berkembang<br>(x2)</th>
+                        <th class="border border-slate-200 p-1 text-red-600 bg-red-50 text-xs">Perhatian<br>(x1)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($logAgregasi as $ag)
+                    @php 
+                        $warnaStatus = $ag['status_akhir'] == 'Sejahtera' ? 'text-[#14532d]' : ($ag['status_akhir'] == 'Berkembang' ? 'text-[#22c55e]' : 'text-red-600');
+                    @endphp
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="border-r border-slate-200 p-2 text-left font-bold text-slate-700">{{ $ag['nama_kecamatan'] }}</td>
+                        <td class="border-r border-slate-200 p-2 font-bold">{{ $ag['total_desa'] }}</td>
+                        
+                        <!-- Komposisi -->
+                        <td class="border-r border-slate-200 p-2 text-[#14532d]">{{ $ag['s'] }}</td>
+                        <td class="border-r border-slate-200 p-2 text-[#22c55e]">{{ $ag['b'] }}</td>
+                        <td class="border-r border-slate-200 p-2 text-red-600">{{ $ag['p'] }}</td>
+                        
+                        <!-- Perhitungan Rumus Transparan -->
+                        <td class="border-r border-slate-200 p-2 bg-blue-50/30 font-mono text-xs whitespace-nowrap text-left">
+                            ({{ $ag['s'] }}x3) + ({{ $ag['b'] }}x2) + ({{ $ag['p'] }}x1) = <b>{{ $ag['total_skor'] }}</b>
+                        </td>
+                        
+                        <!-- Rata-rata -->
+                        <td class="border-r border-slate-200 p-2 bg-yellow-50/30 font-mono text-sm font-bold text-yellow-800">
+                            {{ $ag['total_skor'] }} / {{ $ag['total_desa'] }} = {{ $ag['rata_rata'] }}
+                        </td>
+
+                        <!-- Hasil Akhir -->
+                        <td class="p-2 bg-slate-50 text-center">
+                            <div class="font-bold {{ $warnaStatus }} text-sm uppercase">{{ $ag['status_akhir'] }}</div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection
