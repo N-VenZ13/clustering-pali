@@ -91,18 +91,18 @@
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Filter Kesejahteraan</h3>
                     <div class="space-y-3">
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" checked value="1" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#064e3b] focus:ring-[#064e3b]">
-                            <span class="w-4 h-4 rounded bg-[#064e3b] border border-slate-300"></span>
+                            <input type="checkbox" checked value="1" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#08519C] focus:ring-[#08519C]">
+                            <span class="w-4 h-4 rounded bg-[#08519C] border border-slate-300"></span>
                             <span class="text-sm font-bold text-slate-700">Klaster Sejahtera</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" checked value="2" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#10b981] focus:ring-[#10b981]">
-                            <span class="w-4 h-4 rounded bg-[#10b981] border border-slate-300"></span>
+                            <input type="checkbox" checked value="2" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#6BAED6] focus:ring-[#6BAED6]">
+                            <span class="w-4 h-4 rounded bg-[#6BAED6] border border-slate-300"></span>
                             <span class="text-sm font-bold text-slate-700">Klaster Berkembang</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" checked value="3" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#a7f3d0] focus:ring-[#a7f3d0]">
-                            <span class="w-4 h-4 rounded bg-[#a7f3d0] border border-slate-300"></span>
+                            <input type="checkbox" checked value="3" class="chk-cluster w-5 h-5 rounded border-gray-300 text-[#9ECAE1] focus:ring-[#9ECAE1]">
+                            <span class="w-4 h-4 rounded bg-[#9ECAE1] border border-slate-300"></span>
                             <span class="text-sm font-bold text-slate-700">Perlu Perhatian</span>
                         </label>
                     </div>
@@ -169,21 +169,21 @@
                     
                     <div class="space-y-3">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-6 bg-[#14532d] rounded border border-green-900 shadow-sm flex-shrink-0"></div>
+                            <div class="w-12 h-6 bg-[#08519C] rounded border border-blue-900 shadow-sm flex-shrink-0"></div>
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800">Klaster I (Sejahtera)</h4>
                                 <p class="text-xs text-slate-500">Nilai indikator fasilitas berada di atas rata-rata.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-6 bg-[#22c55e] rounded border border-green-600 shadow-sm flex-shrink-0"></div>
+                            <div class="w-12 h-6 bg-[#6BAED6] rounded border border-blue-600 shadow-sm flex-shrink-0"></div>
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800">Klaster II (Berkembang)</h4>
                                 <p class="text-xs text-slate-500">Infrastruktur memadai namun butuh peningkatan.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-6 bg-[#bbf7d0] rounded border border-green-300 shadow-sm flex-shrink-0"></div>
+                            <div class="w-12 h-6 bg-[#9ECAE1] rounded border border-blue-300 shadow-sm flex-shrink-0"></div>
                             <div>
                                 <h4 class="text-sm font-bold text-slate-800">Klaster III (Perlu Perhatian)</h4>
                                 <p class="text-xs text-slate-500">Banyak fasilitas desa berada di bawah standar.</p>
@@ -271,9 +271,9 @@
         // 3. LOGIKA WARNA (THE GREEN PALETTE BPS)
         // ==========================================
         function getColorByKlaster(klaster) {
-            if(klaster == 1) return '#064e3b'; // Hijau Tua (Sejahtera)
-            if(klaster == 2) return '#10b981'; // Hijau Sedang (Berkembang)
-            if(klaster == 3) return '#a7f3d0'; // Hijau Pucat (Perlu Perhatian)
+            if(klaster == 1) return '#08519C'; // Hijau Tua (Sejahtera)
+            if(klaster == 2) return '#6BAED6'; // Hijau Sedang (Berkembang)
+            if(klaster == 3) return '#9ECAE1'; // Hijau Pucat (Perlu Perhatian)
             return '#cbd5e1'; // Abu-abu (Belum diproses)
         }
 
@@ -380,7 +380,7 @@
             // JIKA KECAMATAN DIKLIK
             if (tipe === 'Kecamatan') {
                 if(dbInfo && dbInfo.status_akhir) {
-                    let colorClass = dbInfo.status_akhir == 'Sejahtera' ? 'bg-[#14532d]/10 text-[#14532d] border-[#14532d]/30' : (dbInfo.status_akhir == 'Berkembang' ? 'bg-[#22c55e]/10 text-[#22c55e] border-[#22c55e]/30' : 'bg-[#bbf7d0] text-green-800 border-green-400');
+                    let colorClass = dbInfo.status_akhir == 'Sejahtera' ? 'bg-[#08519C]/10 text-[#14532d] border-[#14532d]/30' : (dbInfo.status_akhir == 'Berkembang' ? 'bg-[#6BAED6]/10 text-[#22c55e] border-[#22c55e]/30' : 'bg-[#9ECAE1] text-green-800 border-green-400');
                     statusBox.className = `inline-block px-4 py-2 rounded-lg text-sm font-bold border mb-6 ${colorClass}`;
                     statusBox.innerHTML = `Status Agregasi: ${dbInfo.status_akhir} <br><span class="text-xs font-normal opacity-80">Skor Mayoritas: ${dbInfo.skor_agregasi}</span>`;
                 } else {
@@ -394,9 +394,9 @@
                     dbInfo.desas.forEach(desa => {
                         let klaster = desa.indikators.length > 0 ? desa.indikators[0].klaster_hasil : null;
                         let dotColor = 'bg-slate-300'; let label = 'Belum diproses';
-                        if(klaster == 1) { dotColor = 'bg-[#14532d]'; label = 'Sejahtera'; }
-                        if(klaster == 2) { dotColor = 'bg-[#22c55e]'; label = 'Berkembang'; }
-                        if(klaster == 3) { dotColor = 'bg-[#bbf7d0] border border-green-300'; label = 'Perlu Perhatian'; }
+                        if(klaster == 1) { dotColor = 'bg-[#08519C]'; label = 'Sejahtera'; }
+                        if(klaster == 2) { dotColor = 'bg-[#6BAED6]'; label = 'Berkembang'; }
+                        if(klaster == 3) { dotColor = 'bg-[#9ECAE1] border border-green-300'; label = 'Perlu Perhatian'; }
 
                         contentHTML += `
                             <div class="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-100">

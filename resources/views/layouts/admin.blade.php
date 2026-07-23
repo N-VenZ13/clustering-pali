@@ -40,8 +40,6 @@
             <!-- Logo & Toggle Button -->
             <div class="h-16 flex items-center justify-between px-4 border-b border-white/10">
                 <div class="flex items-center gap-3 overflow-hidden whitespace-nowrap">
-                    <!-- Icon Peta / Logo -->
-                    <!-- <svg class="w-8 h-8 flex-shrink-0 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> -->
                     <span x-show="sidebarOpen" class="text-xl font-bold tracking-wider">WebGIS PALI</span>
                 </div>
                 <!-- Toggle Button -->
@@ -54,7 +52,6 @@
 
             <!-- Menu Navigasi -->
             <nav class="flex-1 px-3 py-6 space-y-2 overflow-hidden">
-
                 <!-- Menu Dashboard -->
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg transition group {{ request()->routeIs('dashboard') ? 'bg-white/10 text-white font-medium' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white' }}" title="Dashboard">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +94,7 @@
                 </div>
 
                 <!-- Menu Data User -->
-                 @if(Auth::user()->role === 'admin')
+                @if(Auth::user()->role === 'admin')
                 <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg transition group {{ request()->routeIs('users.*') ? 'bg-white/10 text-white font-medium' : 'text-[#CBD5E1] hover:bg-white/5 hover:text-white' }}" title="Data User">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -121,9 +118,6 @@
             <!-- Header / Topbar -->
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 z-10">
                 <h1 class="text-xl font-bold text-[#334155]">@yield('title')</h1>
-
-                <!-- Logo Topbar -->
-                    <!-- <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-8 h-8 rounded-full border border-slate-200 object-contain p-0.5"> -->
 
                 <!-- Profile / Logout -->
                 <div class="flex items-center gap-4">
@@ -177,9 +171,18 @@
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 overflow-hidden mx-4 text-center">
 
-                <!-- Icon Peringatan (Kuning/Merah dinamis) -->
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4" :class="confirmBtnColor == 'red' ? 'bg-red-100' : 'bg-orange-100'">
-                    <svg :class="confirmBtnColor == 'red' ? 'text-red-600' : 'text-orange-600'" class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Icon Peringatan (Kuning/Merah/Hijau dinamis) -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4" 
+                     :class="{
+                        'bg-red-100': confirmBtnColor == 'red',
+                        'bg-orange-100': confirmBtnColor == 'orange',
+                        'bg-emerald-100': confirmBtnColor == 'green'
+                     }">
+                    <svg :class="{
+                            'text-red-600': confirmBtnColor == 'red',
+                            'text-orange-600': confirmBtnColor == 'orange',
+                            'text-emerald-600': confirmBtnColor == 'green'
+                         }" class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
@@ -192,13 +195,42 @@
                 <div class="flex items-center justify-center gap-3">
                     <button type="button" @click="confirmModal = false" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition w-full">Batal</button>
 
-                    <!-- Tombol ini yang akan meng-submit form rahasia -->
+                    <!-- Tombol Submit Form Dinamis -->
                     <button type="button"
                         @click="document.getElementById(confirmFormId).submit(); confirmModal = false;"
-                        :class="confirmBtnColor == 'red' ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-orange-600'"
+                        :class="{
+                            'bg-red-500 hover:bg-red-600': confirmBtnColor == 'red',
+                            'bg-orange-500 hover:bg-orange-600': confirmBtnColor == 'orange',
+                            'bg-emerald-500 hover:bg-emerald-600': confirmBtnColor == 'green'
+                        }"
                         class="px-5 py-2.5 text-white font-semibold rounded-xl transition w-full shadow-sm" x-text="confirmBtnText">
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- MODAL TOLAK LAPORAN (Khusus Catatan) -->
+        <div x-data="{ rejectModal: false, rejectFormId: '' }"
+            @open-reject-modal.window="rejectModal = true; rejectFormId = $event.detail.formId"
+            class="fixed inset-0 z-[100] flex items-center justify-center" x-cloak x-show="rejectModal">
+
+            <div x-show="rejectModal" x-transition.opacity class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="rejectModal = false"></div>
+
+            <div x-show="rejectModal" x-transition class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                <h3 class="text-xl font-bold text-red-600 mb-4">Tolak Laporan?</h3>
+                <p class="text-sm text-slate-500 mb-4">Mohon tuliskan alasan penolakan/revisi agar Admin tahu apa yang harus diperbaiki.</p>
+
+                <form :id="rejectFormId" action="{{ route('laporan.status') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="tahun" value="{{ $tahun_aktif ?? '' }}">
+                    <input type="hidden" name="status" value="rejected">
+                    <textarea name="catatan" required class="w-full border-gray-300 rounded-lg mb-4" placeholder="Contoh: Periksa data Listrik di Desa A..."></textarea>
+
+                    <div class="flex gap-3">
+                        <button type="button" @click="rejectModal = false" class="w-full py-2 border rounded-lg text-sm font-bold">Batal</button>
+                        <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-lg text-sm font-bold">Kirim Penolakan</button>
+                    </div>
+                </form>
             </div>
         </div>
 

@@ -18,14 +18,14 @@
         <!-- Tombol Download Template Excel -->
         <a href="{{ asset('downloads/Template_Data_KMeans_PALI.xlsx') }}" download class="bg-[#1E3A8A] hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2 transition shadow-md shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            Download Template Excel
+            Download Template Data K-Means
         </a>
     </div>
 
     <!-- INDIKATOR LIST CARD -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         
-        <!-- 1. Listrik PLN -->
+    <!-- 1. Listrik PLN -->
         <div class="px-6 py-5 border-b border-slate-100 hover:bg-slate-50 transition">
             <div class="flex items-start gap-4">
                 <div class="w-8 h-8 shrink-0 rounded-full bg-blue-50 text-[#1E3A8A] flex items-center justify-center font-bold text-sm border border-blue-100">1</div>

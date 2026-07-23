@@ -103,21 +103,21 @@
 <!-- SUMMARY CARDS (Tengah) -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#14532d] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#08519C] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster I (Sejahtera)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_1'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#22c55e] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#6BAED6] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster II (Berkembang)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_2'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 flex items-center gap-4">
-        <div class="w-3 h-12 bg-[#bbf7d0] rounded-full"></div>
+        <div class="w-3 h-12 bg-[#9ECAE1] rounded-full"></div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Klaster III (Perlu Perhatian)</p>
             <h4 class="text-2xl font-bold text-[#1E293B]">{{ $summary['klaster_3'] }} <span class="text-sm font-normal text-slate-500">Desa</span></h4>
@@ -182,11 +182,11 @@
                     <td class="px-4 py-4 text-slate-500">{{ $row->keamanan_bencana }}</td>
                     <td class="px-6 py-4 text-right">
                         @if($row->klaster_hasil == 1)
-                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#14532d] text-white font-bold rounded-md">1 - Sejahtera</span>
+                        <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#08519C] text-white font-bold rounded-md">1 - Sejahtera</span>
                                 @elseif($row->klaster_hasil == 2)
-                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#22c55e] text-white font-bold rounded-md">2 - Berkembang</span>
+                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#6BAED6] text-white font-bold rounded-md">2 - Berkembang</span>
                                 @elseif($row->klaster_hasil == 3)
-                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#bbf7d0] text-green-900 font-bold rounded-md">3 - Perhatian</span>
+                                    <span class="inline-block whitespace-nowrap px-3 py-1 bg-[#9ECAE1] text-white font-bold rounded-md">3 - Perhatian</span>
                         @else
                         <span class="inline-block whitespace-nowrap text-slate-400 italic">- Belum Diproses -</span>
                         @endif

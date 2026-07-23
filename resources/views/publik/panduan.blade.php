@@ -29,11 +29,11 @@
             <!-- Section 1 -->
             <section>
                 <h2 class="text-xl font-bold text-[#1E293B] mb-3 flex items-center gap-2"><span class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm">1</span> Membaca Peta Choropleth (Gradasi Warna)</h2>
-                <p class="text-slate-600 leading-relaxed mb-4 text-justify">Sistem ini menggunakan teknik kartografi <i>Choropleth</i> monokromatik hijau. Semakin pekat warna hijau pada suatu poligon wilayah, maka semakin tinggi tingkat kesejahteraannya. Wilayah dengan warna hijau sangat pucat menandakan daerah tersebut berstatus "Perlu Perhatian".</p>
+                <p class="text-slate-600 leading-relaxed mb-4 text-justify">Sistem ini menggunakan teknik kartografi <i>Choropleth</i> monokromatik biru. Semakin pekat warna biru pada suatu poligon wilayah, maka semakin tinggi tingkat kesejahteraannya. Wilayah dengan warna biru sangat pucat menandakan daerah tersebut berstatus "Perlu Perhatian".</p>
                 <div class="flex gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#14532d] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Sejahtera</span></div>
-                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#22c55e] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Berkembang</span></div>
-                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#bbf7d0] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Perhatian</span></div>
+                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#08519C] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Sejahtera</span></div>
+                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#6BAED6] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Berkembang</span></div>
+                    <div class="flex flex-col items-center"><div class="w-16 h-8 bg-[#9ECAE1] rounded shadow-sm"></div><span class="text-xs mt-1 font-bold">Perhatian</span></div>
                 </div>
             </section>
 

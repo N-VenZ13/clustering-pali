@@ -23,49 +23,56 @@
     </div>
 
     <!-- TAHAP 2: NORMALISASI -->
+    <!-- TAHAP 2: STANDARDISASI Z-SCORE -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
-        <h3 class="font-bold text-[#1E3A8A] text-lg border-b pb-2 mb-4">TAHAP 2: Normalisasi Min-Max Scaler</h3>
-        <p class="text-slate-700 text-sm mb-4">Menyamakan skala seluruh data ke dalam rentang <b>0 hingga 1</b> agar tidak ada variabel yang mendominasi variabel lain (karena satuan Listrik PLN ribuan, sedangkan fasilitas ekonomi hanya satuan).</p>
+        <h3 class="font-bold text-[#1E3A8A] text-lg border-b pb-2 mb-4">TAHAP 2: Standardisasi Z-Score (Standard Scaler)</h3>
+        <p class="text-slate-700 text-sm mb-4 leading-relaxed text-justify">
+            Untuk mengatasi bias akibat rentang nilai yang sangat jauh dan keberadaan nilai 0 (nol) absolut pada data riil, sistem menggunakan metode <b>Z-Score Standardization</b>. Metode ini mengubah data menjadi distribusi normal dengan memusatkan data pada nilai Rata-rata (Mean = 0) dan membaginya dengan Simpangan Baku (Standard Deviation). <i>Catatan: Hasil Z-Score dapat bernilai negatif (-), hal ini wajar dan sangat valid untuk dihitung menggunakan Euclidean Distance pada tahap selanjutnya karena nilainya akan dikuadratkan.</i>
+        </p>
         
         <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
-            <h4 class="font-bold text-blue-900 mb-2">Rumus Min-Max:</h4>
-            <code class="block bg-white p-3 rounded border text-blue-800 text-sm">Nilai Baru = (Nilai Asli - Nilai Minimum) / (Nilai Maksimum - Nilai Minimum)</code>
+            <h4 class="font-bold text-blue-900 mb-2">Rumus Z-Score:</h4>
+            <code class="block bg-white p-3 rounded border text-blue-800 text-sm font-mono">Z = (X - μ) / σ</code>
+            <p class="text-xs text-blue-800 mt-1 mb-3">Di mana: X = Nilai Data | μ (Mu) = Rata-rata (Mean) | σ (Sigma) = Standar Deviasi</p>
             
-            <h4 class="font-bold text-blue-900 mt-4 mb-2">Contoh Perhitungan ({{ $logData['raw_data'][0]->desa->nama_desa }} - Variabel Listrik PLN):</h4>
-            <ul class="text-sm text-blue-800 space-y-1">
-                <li>Nilai Asli = {{ $logData['raw_data'][0]->listrik_pln }}</li>
-                <li>Nilai Min = {{ $logData['min_max_processed']['listrik_pln']['min'] }} | Nilai Max = {{ $logData['min_max_processed']['listrik_pln']['max'] }}</li>
-                <li><b>Hasil</b> = ({{ $logData['raw_data'][0]->listrik_pln }} - {{ $logData['min_max_processed']['listrik_pln']['min'] }}) / ({{ $logData['min_max_processed']['listrik_pln']['max'] }} - {{ $logData['min_max_processed']['listrik_pln']['min'] }}) = <b>{{ number_format($logData['normalized'][0]['listrik_pln'], 4) }}</b></li>
+            <h4 class="font-bold text-blue-900 mb-2 border-t border-blue-200 pt-3">Contoh Perhitungan ({{ $logData['raw_data'][0]->desa->nama_desa }} - Variabel Listrik PLN):</h4>
+            <ul class="text-sm text-blue-800 space-y-1 font-mono">
+                <li>X (Nilai Asli) = {{ $logData['raw_data'][0]->listrik_pln }}</li>
+                <li>μ (Mean)     = {{ number_format($logData['mean_std_processed']['listrik_pln']['mean'], 4) }}</li>
+                <li>σ (Std.Dev)  = {{ number_format($logData['mean_std_processed']['listrik_pln']['std'], 4) }}</li>
+                <li class="mt-2 text-blue-900 font-bold">
+                    Z-Score = ({{ $logData['raw_data'][0]->listrik_pln }} - {{ number_format($logData['mean_std_processed']['listrik_pln']['mean'], 4) }}) / {{ number_format($logData['mean_std_processed']['listrik_pln']['std'], 4) }} = {{ number_format($logData['normalized'][0]['listrik_pln'], 5) }}
+                </li>
             </ul>
         </div>
 
         <div class="overflow-x-auto mt-4">
-            <table class="w-full text-xs text-left border-collapse border border-slate-200">
+            <table class="w-full text-xs text-right border-collapse border border-slate-200">
                 <thead class="bg-slate-100">
                     <tr>
-                        <th class="border border-slate-200 p-2">Desa</th>
-                        <th class="border border-slate-200 p-2">Listrik</th>
-                        <th class="border border-slate-200 p-2">Fas. Eko</th>
-                        <th class="border border-slate-200 p-2">Fas. Pend</th>
-                        <th class="border border-slate-200 p-2">Akses SMA</th>
-                        <th class="border border-slate-200 p-2">Faskes</th>
-                        <th class="border border-slate-200 p-2">Jarak Pusk</th>
-                        <th class="border border-slate-200 p-2">Sinyal</th>
-                        <th class="border border-slate-200 p-2">Bencana</th>
+                        <th class="border border-slate-200 p-2 text-left">Desa</th>
+                        <th class="border border-slate-200 p-2">Listrik (Z)</th>
+                        <th class="border border-slate-200 p-2">Fas. Eko (Z)</th>
+                        <th class="border border-slate-200 p-2">Fas. Pend (Z)</th>
+                        <th class="border border-slate-200 p-2">Akses SMA (Z)</th>
+                        <th class="border border-slate-200 p-2">Faskes (Z)</th>
+                        <th class="border border-slate-200 p-2">Jarak Pusk (Z)</th>
+                        <th class="border border-slate-200 p-2">Sinyal (Z)</th>
+                        <th class="border border-slate-200 p-2">Bencana (Z)</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($logData['normalized'] as $index => $norm)
                     <tr class="hover:bg-slate-50">
-                        <td class="border border-slate-200 p-2 font-bold">{{ $logData['raw_data'][$index]->desa->nama_desa }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['listrik_pln'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['fasilitas_ekonomi'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['fasilitas_pendidikan'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['skor_akses_sma'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['faskes_desa'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['skor_akses_puskesmas'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['skor_kualitas_sinyal'], 4) }}</td>
-                        <td class="border border-slate-200 p-2">{{ number_format($norm['keamanan_bencana'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 font-bold text-left">{{ $logData['raw_data'][$index]->desa->nama_desa }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['listrik_pln'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['listrik_pln'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['fasilitas_ekonomi'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['fasilitas_ekonomi'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['fasilitas_pendidikan'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['fasilitas_pendidikan'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['skor_akses_sma'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['skor_akses_sma'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['faskes_desa'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['faskes_desa'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['skor_akses_puskesmas'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['skor_akses_puskesmas'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['skor_kualitas_sinyal'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['skor_kualitas_sinyal'], 4) }}</td>
+                        <td class="border border-slate-200 p-2 {{ $norm['keamanan_bencana'] < 0 ? 'text-red-600' : 'text-blue-600' }}">{{ number_format($norm['keamanan_bencana'], 4) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -83,7 +90,7 @@
             @php $c1 = $logData['initial_centroids'][0]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 1 (Tertinggi)</p>
-                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-800">{{ $c1['_nama_desa'] }}</b></p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-blue-800">{{ $c1['_nama_desa'] }}</b></p>
                 <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
                     [ {{ number_format($c1['listrik_pln'] ?? 0, 2) }}, {{ number_format($c1['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c1['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c1['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c1['faskes_desa'] ?? 0, 2) }}, {{ number_format($c1['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c1['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c1['keamanan_bencana'] ?? 0, 2) }} ]
                 </div>
@@ -93,7 +100,7 @@
             @php $c2 = $logData['initial_centroids'][1]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 2 (Median)</p>
-                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-600">{{ $c2['_nama_desa'] }}</b></p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-blue-600">{{ $c2['_nama_desa'] }}</b></p>
                 <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
                     [ {{ number_format($c2['listrik_pln'] ?? 0, 2) }}, {{ number_format($c2['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c2['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c2['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c2['faskes_desa'] ?? 0, 2) }}, {{ number_format($c2['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c2['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c2['keamanan_bencana'] ?? 0, 2) }} ]
                 </div>
@@ -103,7 +110,7 @@
             @php $c3 = $logData['initial_centroids'][2]; @endphp
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p class="font-bold text-[#1E3A8A] mb-1">Centroid 3 (Terendah)</p>
-                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-green-300">{{ $c3['_nama_desa'] }}</b></p>
+                <p class="text-xs text-slate-500 mb-2">Diambil dari: <b class="text-blue-300">{{ $c3['_nama_desa'] }}</b></p>
                 <div class="text-[11px] bg-white p-2 rounded border border-slate-100 font-mono overflow-x-auto whitespace-nowrap">
                     [ {{ number_format($c3['listrik_pln'] ?? 0, 2) }}, {{ number_format($c3['fasilitas_ekonomi'] ?? 0, 2) }}, {{ number_format($c3['fasilitas_pendidikan'] ?? 0, 2) }}, {{ number_format($c3['skor_akses_sma'] ?? 0, 2) }}, {{ number_format($c3['faskes_desa'] ?? 0, 2) }}, {{ number_format($c3['skor_akses_puskesmas'] ?? 0, 2) }}, {{ number_format($c3['skor_kualitas_sinyal'] ?? 0, 2) }}, {{ number_format($c3['keamanan_bencana'] ?? 0, 2) }} ]
                 </div>
@@ -198,24 +205,24 @@
                         <th class="border border-slate-200 p-2 bg-[#1E3A8A] text-white" rowspan="2">Status Akhir</th>
                     </tr>
                     <tr>
-                        <th class="border border-slate-200 p-1 text-[#14532d] bg-[#14532d]/10 text-xs">Sejahtera<br>(x3)</th>
-                        <th class="border border-slate-200 p-1 text-[#22c55e] bg-[#22c55e]/10 text-xs">Berkembang<br>(x2)</th>
-                        <th class="border border-slate-200 p-1 text-red-600 bg-red-50 text-xs">Perhatian<br>(x1)</th>
+                        <th class="border border-slate-200 p-1 text-[#08519C] bg-[#08519C]/10 text-xs">Sejahtera<br>(x3)</th>
+                        <th class="border border-slate-200 p-1 text-[#6BAED6] bg-[#6BAED6]/10 text-xs">Berkembang<br>(x2)</th>
+                        <th class="border border-slate-200 p-1 text-[#9ECAE1] bg-[#9ECAE1]/10 text-xs">Perhatian<br>(x1)</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($logAgregasi as $ag)
                     @php 
-                        $warnaStatus = $ag['status_akhir'] == 'Sejahtera' ? 'text-[#14532d]' : ($ag['status_akhir'] == 'Berkembang' ? 'text-[#22c55e]' : 'text-red-600');
+                        $warnaStatus = $ag['status_akhir'] == 'Sejahtera' ? 'text-[#08519C]' : ($ag['status_akhir'] == 'Berkembang' ? 'text-[#6BAED6]' : 'text-[#9ECAE1]');
                     @endphp
                     <tr class="hover:bg-slate-50 border-b border-slate-100">
                         <td class="border-r border-slate-200 p-2 text-left font-bold text-slate-700">{{ $ag['nama_kecamatan'] }}</td>
                         <td class="border-r border-slate-200 p-2 font-bold">{{ $ag['total_desa'] }}</td>
                         
                         <!-- Komposisi -->
-                        <td class="border-r border-slate-200 p-2 text-[#14532d]">{{ $ag['s'] }}</td>
-                        <td class="border-r border-slate-200 p-2 text-[#22c55e]">{{ $ag['b'] }}</td>
-                        <td class="border-r border-slate-200 p-2 text-red-600">{{ $ag['p'] }}</td>
+                        <td class="border-r border-slate-200 p-2 text-[#08519C]">{{ $ag['s'] }}</td>
+                        <td class="border-r border-slate-200 p-2 text-[#6BAED6]">{{ $ag['b'] }}</td>
+                        <td class="border-r border-slate-200 p-2 text-[#9ECAE1]">{{ $ag['p'] }}</td>
                         
                         <!-- Perhitungan Rumus Transparan -->
                         <td class="border-r border-slate-200 p-2 bg-blue-50/30 font-mono text-xs whitespace-nowrap text-left">

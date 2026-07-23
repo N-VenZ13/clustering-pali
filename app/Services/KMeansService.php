@@ -134,31 +134,55 @@ class KMeansService
     }
 
     // --- FUNGSI MATEMATIKA ---
-    private function normalize($data)
+    // Diubah dari Min-Max menjadi Z-Score Standardization
+    private function normalize($data, &$logStats = null)
     {
-        $minMax = [];
+        $stats = [];
+        $count = $data->count();
+
+        // 1. Hitung Mean (Rata-rata) dan Standar Deviasi tiap kolom
         foreach ($this->processColumns as $col) {
-            $minMax[$col] = [
-                'min' => $data->min(fn($item) => $item->{$col}), 
-                'max' => $data->max(fn($item) => $item->{$col})
+            // Hitung Mean
+            $sum = $data->sum(fn($item) => $item->{$col});
+            $mean = $sum / $count;
+
+            // Hitung Variance (Ragam)
+            $varianceSum = 0;
+            foreach ($data as $item) {
+                $varianceSum += pow($item->{$col} - $mean, 2);
+            }
+            // Standar Deviasi = Akar Kuadrat dari Variance
+            $variance = $varianceSum / $count;
+            $stdDev = sqrt($variance);
+
+            $stats[$col] = [
+                'mean' => $mean,
+                'std' => $stdDev
             ];
         }
 
+        // Jika fungsi dipanggil oleh getCalculationLog, simpan variabel stats-nya
+        if ($logStats !== null) {
+            $logStats = $stats;
+        }
+
+        // 2. Terapkan Rumus Z-Score: Z = (X - Mean) / StdDev
         $normalized = [];
         foreach ($data as $row) {
             $normRow = [];
-            
-            // --- TAMBAHAN KITA: Bawa nama desanya ---
             $normRow['_nama_desa'] = $row->desa->nama_desa; 
             
             foreach ($this->processColumns as $col) {
                 $val = $row->$col;
-                $min = $minMax[$col]['min'];
-                $max = $minMax[$col]['max'];
-                $normRow[$col] = ($max - $min) == 0 ? 0 : ($val - $min) / ($max - $min);
+                $mean = $stats[$col]['mean'];
+                $std = $stats[$col]['std'];
+                
+                // Mencegah Division by Zero
+                $normRow[$col] = ($std == 0) ? 0 : ($val - $mean) / $std;
             }
             $normalized[] = $normRow;
         }
+        
         return $normalized;
     }
 
@@ -221,8 +245,13 @@ class KMeansService
             ];
         }
 
-        // 3. Normalisasi
-        $normalizedData = $this->normalize($data);
+         // 3. Standardisasi Z-Score
+        $meanStdStats = [];
+        // Panggil fungsi normalize, sekalian menangkap nilai Mean & StdDev-nya
+        $normalizedData = $this->normalize($data, $meanStdStats);
+        
+        // Simpan ke array log untuk ditampilkan ke View
+        $log['mean_std_processed'] = $meanStdStats; 
         $log['normalized'] = $normalizedData;
 
         // 4. Inisialisasi Centroid

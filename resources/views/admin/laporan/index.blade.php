@@ -39,18 +39,21 @@
     <!-- Tombol Aksi -->
     <div class="flex items-center gap-3">
 
-        {{-- Tombol KHUSUS PIMPINAN (Hanya muncul jika status pending) --}}
+        {{-- Tombol KHUSUS PIMPINAN (Jika Laporan masih Pending) --}}
         @if(Auth::user()->role === 'pimpinan' && $status_dokumen === 'pending')
         <div x-data="{ showCatatan: false }" class="flex items-center gap-2">
+
+            <!-- Form Tolak -->
             <form action="{{ route('laporan.status') }}" method="POST" class="flex items-center gap-2" x-show="showCatatan" x-cloak>
                 @csrf
                 <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
                 <input type="hidden" name="status" value="rejected">
-                <input type="text" name="catatan" placeholder="Tulis alasan penolakan..." required class="border-red-300 rounded-lg text-sm px-3 py-1.5 focus:ring-red-500 min-w-[250px]">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-3 rounded-lg text-sm transition">Kirim Penolakan</button>
-                <button type="button" @click="showCatatan = false" class="text-slate-400 hover:text-slate-600 px-2">Batal</button>
+                <input type="text" name="catatan" placeholder="Alasan penolakan..." required class="border-red-300 rounded-lg text-sm px-3 py-1.5 focus:ring-red-500 w-48">
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-3 rounded-lg text-sm transition">Kirim</button>
+                <button type="button" @click="showCatatan = false" class="text-slate-400 hover:text-slate-600 px-2 text-sm font-bold">X</button>
             </form>
 
+            <!-- Tombol Pemicu & Terima -->
             <div x-show="!showCatatan" class="flex items-center gap-2">
                 <button type="button" @click="showCatatan = true" class="bg-red-100 text-red-600 hover:bg-red-200 font-semibold py-2 px-4 rounded-lg text-sm transition border border-red-200">Tolak Laporan</button>
 
@@ -59,11 +62,29 @@
                     <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
                     <input type="hidden" name="status" value="accepted">
                     <button type="button"
-                        @click="$dispatch('open-confirm', { title: 'Terima & Publish?', msg: 'Peta K-Means tahun {{ $tahun_aktif }} akan otomatis muncul di halaman publik.', btnText: 'Ya, Publish', btnColor: 'green', formId: 'form-accept' })"
-                        class="bg-[#10B981] hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition shadow-sm">Terima & Publish</button>
+                        @click="$dispatch('open-confirm', { title: 'Terima & Publish?', msg: 'Peta K-Means tahun {{ $tahun_aktif }} akan muncul di halaman publik.', btnText: 'Ya, Publish', btnColor: 'green', formId: 'form-accept' })"
+                        class="bg-[#10B981] hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                        Terima & Publish
+                    </button>
                 </form>
             </div>
         </div>
+        @endif
+
+        {{-- TOMBOL CABUT ACC (Khusus Pimpinan Jika Sudah Accepted) --}}
+        @if(Auth::user()->role === 'pimpinan' && $status_dokumen === 'accepted')
+        <form id="form-unpublish" action="{{ route('laporan.status') }}" method="POST">
+            @csrf
+            <input type="hidden" name="tahun" value="{{ $tahun_aktif }}">
+            <input type="hidden" name="status" value="rejected"> <!-- Dikembalikan ke status Rejected/Revisi -->
+            <input type="hidden" name="catatan" value="Dibatalkan oleh Pimpinan untuk revisi ulang (Unpublished).">
+
+            <button type="button"
+                @click="$dispatch('open-confirm', { title: 'Cabut Laporan?', msg: 'Peta tahun {{ $tahun_aktif }} akan DIHAPUS dari halaman publik dan dikembalikan ke Admin untuk direvisi.', btnText: 'Ya, Cabut', btnColor: 'red', formId: 'form-unpublish' })"
+                class="bg-orange-100 text-orange-700 hover:bg-orange-200 font-bold py-2 px-4 rounded-lg text-sm transition border border-orange-200 shadow-sm" title="Kembalikan laporan ke Admin">
+                Batalkan Persetujuan (Unpublish)
+            </button>
+        </form>
         @endif
 
         {{-- Tombol Cetak PDF --}}
@@ -93,15 +114,19 @@
     </div>
     @endif
 
-    <!-- KOP SURAT -->
+    <!-- KOP SURAT (Rata Kiri) -->
     <div class="flex items-center gap-6 border-b-[3px] border-double border-[#1E293B] pb-5 mb-8 relative z-10">
-        <div class="w-20 h-20 bg-white flex items-center justify-center shrink-0">
+        <!-- Logo -->
+        <div class="w-24 h-24 bg-white flex items-center justify-center shrink-0">
             <img src="{{ asset('images/logo.png') }}" class="w-full h-full object-contain">
         </div>
-        <div class="flex-1 text-center pr-20">
-            <h1 class="text-xl font-bold text-[#1E293B] uppercase tracking-wide">BADAN PUSAT STATISTIK</h1>
-            <h2 class="text-lg font-bold text-[#1E293B] uppercase">KABUPATEN PENUKAL ABAB LEMATANG ILIR</h2>
-            <p class="text-xs text-[#64748B] mt-1">Jalan Merdeka, Talang Ubi, Kabupaten PALI, Sumatera Selatan</p>
+
+        <!-- Teks Kop Surat (Rata Kiri) -->
+        <div class="flex-1 text-left">
+            <h1 class="text-xl font-bold text-[#1E293B] uppercase tracking-wide leading-tight">BADAN PUSAT STATISTIK</h1>
+            <h2 class="text-2xl font-black text-[#1E293B] uppercase tracking-wider mb-1">KABUPATEN PENUKAL ABAB LEMATANG ILIR</h2>
+            <p class="text-xs text-[#64748B]">Jalan Merdeka, Kelurahan Handayani Mulya, Kecamatan Talang Ubi, Kab. PALI, Sumatera Selatan 31211</p>
+            <p class="text-[10px] text-[#64748B] mt-0.5 italic">Website: palikab.bps.go.id | Email: bps1612@bps.go.id</p>
         </div>
     </div>
 
@@ -117,7 +142,7 @@
         <p>Hasil pemetaan ini ditujukan sebagai landasan strategis bagi Pemerintah Daerah dalam mengalokasikan program bantuan, perbaikan infrastruktur, dan pengentasan kemiskinan agar lebih presisi dan tepat sasaran. Berikut adalah konklusi kondisi tiap kecamatan:</p>
     </div>
 
-    <!-- TABEL ANALISIS KECAMATAN (YANG DIINGINKAN DOSEN) -->
+    <!-- TABEL ANALISIS KECAMATAN -->
     <table class="w-full border-collapse border border-slate-300 mb-10 relative z-10 text-sm">
         <thead>
             <tr class="bg-slate-100 text-[#1E293B]">
@@ -130,7 +155,6 @@
         <tbody>
             @foreach($kecamatans as $index => $kec)
             @php
-            // Menghitung komposisi nyata
             $s = 0; $b = 0; $p = 0; $total = 0;
             foreach($kec->desas as $desa) {
             $klaster = $desa->indikators->first() ? $desa->indikators->first()->klaster_hasil : null;
@@ -138,7 +162,6 @@
             if($klaster) $total++;
             }
 
-            // Merangkai kalimat AI Insight yang ramah pimpinan
             $insight = "Data tidak tersedia.";
             if($total > 0) {
             $persen = round((max($s, $b, $p) / $total) * 100);
@@ -164,7 +187,7 @@
                     </div>
                 </td>
                 <td class="border border-slate-300 px-3 py-3 text-center align-top font-bold 
-                        {{ $kec->status_akhir == 'Sejahtera' ? 'text-[#14532d]' : ($kec->status_akhir == 'Perlu Perhatian' ? 'text-red-600' : 'text-[#16a34a]') }}">
+                        {{ $kec->status_akhir == 'Sejahtera' ? 'text-[#08519C]' : ($kec->status_akhir == 'Perlu Perhatian' ? 'text-[#9ECAE1]' : 'text-[#6BAED6]') }}">
                     {{ $kec->status_akhir ?? '-' }}
                 </td>
                 <td class="border border-slate-300 px-4 py-3 align-top text-justify leading-relaxed">
@@ -188,9 +211,9 @@
                         @php
                         $klaster = $desa->indikators->first() ? $desa->indikators->first()->klaster_hasil : null;
                         $label = '-'; $warna = '';
-                        if($klaster == 1) { $label = 'Sejahtera'; $warna = 'text-[#14532d]'; }
-                        elseif($klaster == 2) { $label = 'Berkembang'; $warna = 'text-[#16a34a]'; }
-                        elseif($klaster == 3) { $label = 'Perlu Perhatian'; $warna = 'text-red-600'; }
+                        if($klaster == 1) { $label = 'Sejahtera'; $warna = 'text-[#08519C]'; }
+                        elseif($klaster == 2) { $label = 'Berkembang'; $warna = 'text-[#6BAED6]'; }
+                        elseif($klaster == 3) { $label = 'Perlu Perhatian'; $warna = 'text-[#9ECAE1]'; }
                         @endphp
                         <tr class="border-b border-gray-100">
                             <td class="py-1.5 px-2">{{ $desa->nama_desa }}</td>
@@ -208,21 +231,21 @@
         </div>
     </div>
 
-    <!-- TANDA TANGAN (Sesuai Permintaan) -->
-    <div class="flex justify-end mt-16 relative z-10 break-inside-avoid">
-        <div class="text-center w-64">
+    <!-- TANDA TANGAN & WATERMARK WAKTU -->
+    <div class="mt-16 pt-8 flex flex-col items-end relative z-10 break-inside-avoid">
+        <div class="text-center w-64 mb-8">
             <p class="mb-1 text-[#1E293B] text-sm">Talang Ubi, {{ $laporan_aktif && $laporan_aktif->dikunci_pada ? \Carbon\Carbon::parse($laporan_aktif->dikunci_pada)->translatedFormat('d F Y') : date('d F Y') }}</p>
             <p class="font-bold text-[#1E293B] text-sm mb-24">Kepala Badan Pusat Statistik</p>
             <p class="font-bold text-[#1E293B] text-sm underline underline-offset-4">Pusmawaty, S.E., M.M.</p>
-            <!-- NIP Dihilangkan atau bisa Anda isi jika tahu -->
+        </div>
+        <div class="w-full border-t border-slate-300 pt-2 text-right">
+            <p class="text-[9px] text-slate-400 font-mono">
+                Dokumen dicetak dari Sistem WebGIS PALI pada: {{ now()->format('d M Y - H:i:s') }} WIB
+            </p>
         </div>
     </div>
 
-    <!-- TIMESTAMP UNDUH -->
-    <div class="absolute bottom-6 left-12 text-[10px] text-gray-400 font-mono">
-        Dokumen di-generate oleh Sistem WebGIS PALI pada: {{ now()->format('d M Y - H:i:s') }} WIB
-    </div>
-</div>
+</div> <!-- Penutup <div id="print-area"> -->
 
 <!-- CSS KHUSUS PRINT -->
 <style>
@@ -244,6 +267,11 @@
             box-shadow: none;
             border: none;
             padding: 0;
+        }
+
+        @page {
+            size: auto;
+            margin: 4mm;
         }
     }
 </style>

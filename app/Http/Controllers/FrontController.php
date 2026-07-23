@@ -11,39 +11,38 @@ class FrontController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. HANYA ambil tahun yang Laporannya sudah "Accepted" dan >= 2024
+        // 1. Ambil tahun-tahun yang sudah di-ACC Pimpinan (Ambil hanya yang >= 2024)
         $db_years = Laporan::where('status', 'accepted')
                              ->where('tahun', '>=', 2024)
                              ->orderBy('tahun', 'desc')
                              ->pluck('tahun')
                              ->toArray();
         
-        // 2. Buat tahun dummy dari 2024 sampai Tahun Saat Ini (Bukan tahun depan untuk publik)
+        // 2. Buat tahun dummy 5 tahun ke depan dari 2024 (Agar UI Dropdown bagus tapi mentok di 2024)
         $current_year = max((int) date('Y'), 2024);
-        $dummy_years = range($current_year, 2024); 
+        $dummy_years = range($current_year, 2024); // Array akan selalu berakhir di 2024
         
         $list_tahun = array_unique(array_merge($db_years, $dummy_years));
         rsort($list_tahun);
 
         $tahun_aktif = $request->tahun ?? $list_tahun[0];
 
-        // Jika belum ada satupun yang di ACC, kembalikan ke halaman kosong/maintenance
-        if (empty($list_tahun)) {
-            return view('welcome_empty');
+        // 3. KEAMANAN LEVEL 1: Cek apakah laporan tahun yang dipilih SUDAH DI-ACC?
+        $is_published = Laporan::where('tahun', $tahun_aktif)->where('status', 'accepted')->exists();
+
+        // JIKA BELUM DI-ACC, lemparkan ke halaman kosong!
+        if (!$is_published) {
+            return view('welcome_empty', compact('list_tahun', 'tahun_aktif'));
         }
 
-        // $tahun_aktif = $request->tahun ?? $list_tahun[0];
-
-        // 2. Ambil data dengan dinamis perhitungan agregasi
-        $kecamatans = Kecamatan::with(['desas.indikators' => function ($q) use ($tahun_aktif) {
+        // 4. JIKA SUDAH DI-ACC, baru ambil data berat dari database
+        $kecamatans = Kecamatan::with(['desas.indikators' => function($q) use ($tahun_aktif) {
             $q->where('tahun_data', $tahun_aktif);
         }])->get();
 
-        // Hitung Agregasi Status Kecamatan (Metode Weighted Average / Rata-rata Tertimbang)
+        // Hitung Agregasi Status Kecamatan On The Fly (Metode Rata-rata Tertimbang)
         foreach ($kecamatans as $kecamatan) {
-            $jmlSejahtera = 0;  // Bobot 3
-            $jmlBerkembang = 0; // Bobot 2
-            $jmlPerhatian = 0;  // Bobot 1
+            $jmlSejahtera = 0; $jmlBerkembang = 0; $jmlPerhatian = 0;
             $jmlDesa = 0;
 
             foreach ($kecamatan->desas as $desa) {
@@ -57,23 +56,15 @@ class FrontController extends Controller
             }
 
             if ($jmlDesa > 0) {
-                // Kalkulasi Total Skor (Sesuai Bab 4 Skripsi)
                 $totalSkor = ($jmlSejahtera * 3) + ($jmlBerkembang * 2) + ($jmlPerhatian * 1);
-                
-                // Kalkulasi Rata-rata
                 $rataRata = $totalSkor / $jmlDesa;
 
-                // Threshold Status
-                if ($rataRata >= 2.30) {
-                    $status = 'Sejahtera';
-                } elseif ($rataRata >= 1.70 && $rataRata <= 2.29) {
-                    $status = 'Berkembang';
-                } else {
-                    $status = 'Perlu Perhatian';
-                }
+                if ($rataRata >= 2.30) $status = 'Sejahtera';
+                elseif ($rataRata >= 1.70 && $rataRata <= 2.29) $status = 'Berkembang';
+                else $status = 'Perlu Perhatian';
 
                 $kecamatan->status_akhir = $status;
-                $kecamatan->skor_agregasi = number_format($rataRata, 2); // Tampilkan misal: 1.70
+                $kecamatan->skor_agregasi = number_format($rataRata, 2); 
             } else {
                 $kecamatan->status_akhir = null;
                 $kecamatan->skor_agregasi = null;

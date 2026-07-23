@@ -28,31 +28,31 @@
         
         <!-- Card 1: Total Desa -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#1E3A8A]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#22c55e]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Total Desa / Kelurahan</p>
             <h3 class="text-4xl font-bold text-[#1E293B] ml-2">{{ $summary['total_desa'] }}</h3>
         </div>
 
         <!-- Card 2: Klaster Sejahtera -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#14532d]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#08519C]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Klaster Sejahtera</p>
-            <h3 class="text-4xl font-bold text-[#14532d] ml-2">{{ $summary['sejahtera'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#1E293B] ml-2">{{ $summary['sejahtera'] }}</h3>
         </div>
 
         <!-- Card 3: Klaster Berkembang -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#22c55e]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#6BAED6]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Klaster Berkembang</p>
-            <h3 class="text-4xl font-bold text-[#22c55e] ml-2">{{ $summary['berkembang'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#1E293B] ml-2">{{ $summary['berkembang'] }}</h3>
         </div>
 
         <!-- Card 4: Perlu Perhatian -->
         <div class="bg-white rounded-xl shadow-sm p-6 relative overflow-hidden border border-slate-100">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#bbf7d0]"></div>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#9ECAE1]"></div>
             <p class="text-sm font-semibold text-[#64748B] mb-2 ml-2">Perlu Perhatian</p>
             <!-- Warna teks diubah menjadi green-800 agar bisa dibaca di layar putih -->
-            <h3 class="text-4xl font-bold text-green-800 ml-2">{{ $summary['perhatian'] }}</h3>
+            <h3 class="text-4xl font-bold text-[#1E293B] ml-2">{{ $summary['perhatian'] }}</h3>
         </div>
 
     </div>
@@ -140,7 +140,7 @@
                             datasets: [{
                                 label: 'Jumlah Desa',
                                 data: [jmlSejahtera, jmlBerkembang, jmlPerhatian],
-                                backgroundColor: ['#14532d', '#22c55e', '#bbf7d0'],
+                                backgroundColor: ['#08519C', '#6BAED6', '#9ECAE1'],
                                 borderRadius: 6,
                                 borderWidth: 0
                             }]

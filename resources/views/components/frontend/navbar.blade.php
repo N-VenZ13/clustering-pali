@@ -16,13 +16,13 @@
         <!-- Pilihan Bahasa (Dropdown CSS Murni) -->
         <div class="relative hidden md:block group z-50">
             <!-- Tombol Pemicu -->
-            <button type="button" class="flex items-center gap-2 text-sm font-semibold text-white px-3 py-1.5 transition rounded bg-white/10 hover:bg-white/20 border border-white/20 cursor-default">
-                <!-- Gambar Bendera (Pastikan file flag-id.svg ada di public/images/) -->
+            <!-- <button type="button" class="flex items-center gap-2 text-sm font-semibold text-white px-3 py-1.5 transition rounded bg-white/10 hover:bg-white/20 border border-white/20 cursor-default">
+               
                 <img src="{{ asset('images/flag-id.png') }}" alt="ID" class="w-6 h-4 object-cover rounded-sm border border-white/20 shadow-sm" onerror="this.style.display='none'">
                 <span>ID</span> 
                 <svg class="w-4 h-4 opacity-70 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
-            
+             -->
             <!-- Isi Dropdown -->
             <div class="absolute right-0 pt-2 w-36 origin-top-right opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div class="rounded-md bg-white shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden border border-slate-100">
