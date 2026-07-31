@@ -75,5 +75,5 @@ Jika Anda ingin menjalankan aplikasi ini di mesin lokal Anda:
 
 1. Kloning repositori ini:
    ```bash
-   git clone https://github.com/username-anda/webgis-pali.git
+   git clone git clone https://github.com/N-VenZ13/clustering-pali.git
    cd webgis-pali
