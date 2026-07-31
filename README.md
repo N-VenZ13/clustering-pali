@@ -1,59 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🗺️ WebGIS PALI: Sistem Pemetaan Kesejahteraan Sosial Berbasis Machine Learning
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="foto-foto/cluster-kecamatan.png" alt="Peta Kesejahteraan PALI" width="800" style="border-radius: 8px;">
 </p>
 
-## About Laravel
+<p align="center">
+  <a href="#-tentang-proyek">Tentang Proyek</a> •
+  <a href="#-fitur-unggulan">Fitur Unggulan</a> •
+  <a href="#-arsitektur-teknis">Arsitektur</a> •
+  <a href="#-algoritma-k-means">Algoritma</a> •
+  <a href="#-panduan-instalasi">Instalasi</a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📖 Tentang Proyek
+**WebGIS PALI** adalah sebuah Sistem Informasi Geografis (SIG) skala *Enterprise* yang dirancang khusus untuk Badan Pusat Statistik (BPS) Kabupaten Penukal Abab Lematang Ilir. Sistem ini mengotomatisasi proses evaluasi kesejahteraan wilayah perdesaan yang sebelumnya dilakukan secara manual.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini memadukan **Analisis Spasial (Leaflet.js)** dengan **Kecerdasan Buatan (K-Means Clustering)** untuk memproses 8 indikator infrastruktur dan sosial secara objektif. Tujuannya adalah memberikan landasan kuantitatif bagi Pemerintah Daerah dalam mengalokasikan bantuan sosial dan pembangunan infrastruktur secara presisi.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## ✨ Fitur Unggulan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Interaksi Spasial Dinamis (*Drill-Down GIS*)
+Pengguna dapat membedah poligon tingkat kecamatan menjadi tingkat desa hanya dengan satu klik. Peta diwarnai secara *real-time* menggunakan palet kartografi monokromatik (Standar BPS) berdasarkan hasil *Machine Learning*.
+<p align="center">
+  <img src="foto-foto/cluster-desa.png" alt="Peta Desa" width="48%">
+  <img src="foto-foto/insight-desa.png" alt="Smart Insight Panel" width="48%">
+</p>
 
-## Laravel Sponsors
+### 2. Smart Insight AI (Rule-Based Expert System)
+Sistem secara otomatis menganalisis kelemahan infrastruktur dari setiap desa yang diklik (misal: jarak fasilitas kesehatan atau rasio elektrifikasi) dan memberikan narasi rekomendasi kebijakan dalam bahasa eksekutif yang mudah dipahami oleh pimpinan daerah.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Otomatisasi Algoritma (*Command Center*)
+Administrator tidak perlu memahami kodingan Python. Sistem menyediakan fitur **Smart Excel Import** yang secara otomatis mencocokkan nama wilayah (mengatasi masalah *Foreign-Key Error*), menjalankan standarisasi Z-Score, dan melakukan iterasi K-Means langsung dari layar peramban.
+<p align="center">
+  <img src="foto-foto/proses-kmeans.png" alt="Command Center K-Means" width="800">
+</p>
 
-### Premium Partners
+### 4. Ekosistem Validasi Eksekutif (*Locking System*)
+Mengadaptasi alur birokrasi pemerintahan, data yang diproses tidak akan langsung tampil di Peta Publik. Draf laporan harus ditinjau, diberi catatan revisi, dan disetujui (ACC) oleh Pimpinan melalui Dashboard Analitik sebelum dikunci (*Published*) dan di- *render* menjadi PDF Laporan Administratif.
+<p align="center">
+  <img src="foto-foto/dashboard.png" alt="Dashboard Analitik" width="800">
+</p>
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🏗️ Arsitektur Teknis
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Aplikasi ini dibangun menggunakan arsitektur *Monolithic* modern dengan pemisahan *concern* yang ketat (MVC + Service Pattern).
 
-## Code of Conduct
+*   **Framework Backend:** Laravel 11/12 (PHP 8.2+)
+*   **Database:** MySQL (Relational Database)
+*   **Frontend UI:** Tailwind CSS, Alpine.js (Untuk reaktivitas *state* tanpa *reload*)
+*   **Engine Spasial:** Leaflet.js dengan injeksi data JSON *On-The-Fly*
+*   **Pustaka Data:** Maatwebsite/Excel, Chart.js
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🧮 Bedah Algoritma K-Means (Under the Hood)
+Sistem ini tidak menggunakan library ML instan, melainkan membangun ulang (*Hardcoded*) matematika K-Means ke dalam PHP menggunakan *Service Class Pattern* untuk membuktikan pemahaman konseptual:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1.  **Pre-Processing Inversi:** Variabel yang bersifat *Cost* (seperti Jarak tempuh fasilitas) dibalik secara otomatis agar sejalan dengan definisi kesejahteraan (Semakin besar angka, semakin sejahtera).
+2.  **Standardisasi Z-Score:** Menormalisasi data menggunakan Rata-rata dan Standar Deviasi untuk mengatasi ketimpangan nilai ekstrem (seperti ribuan pengguna listrik vs satuan bangunan sekolah).
+3.  **Deterministic Initialization:** Menghindari penyakit bawaan K-Means (*Local Optima* / Hasil Acak) dengan mengurutkan nilai *Z-Score* dan mematok titik awal centroid pada nilai tertinggi, median, dan terendah.
+4.  **Bottom-Up Aggregation:** Menggunakan metode **Rata-rata Tertimbang (Weighted Average)** untuk mengagregasi status puluhan desa menjadi satu kesimpulan status di tingkat Kecamatan, guna meminimalisir bias ketimpangan jumlah desa antar wilayah.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ⚙️ Panduan Instalasi (Development)
+
+Jika Anda ingin menjalankan aplikasi ini di mesin lokal Anda:
+
+1. Kloning repositori ini:
+   ```bash
+   git clone https://github.com/username-anda/webgis-pali.git
+   cd webgis-pali
